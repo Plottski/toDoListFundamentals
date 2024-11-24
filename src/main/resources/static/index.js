@@ -101,6 +101,10 @@ function toDoListDash() {
 
     var headerRow = document.createElement('tr');
 
+    var selectHeader = document.createElement('th');
+    selectHeader.setAttribute('scope', 'col');
+    selectHeader.innerHTML = 'Select';
+
     var titleHeader = document.createElement('th');
     titleHeader.setAttribute('scope', 'col');
     titleHeader.innerHTML = 'Title';
@@ -117,6 +121,7 @@ function toDoListDash() {
     tableBody.id = 'tableBody';
     tableBody.className = 'table-hover';
 
+    headerRow.appendChild(selectHeader);
     headerRow.appendChild(titleHeader);
     headerRow.appendChild(descHeader);
     headerRow.appendChild(userHeader);
@@ -234,6 +239,10 @@ function displayAllItems(data) {
 
     var headerRow = document.createElement('tr');
 
+    var selectHeader = document.createElement('th');
+    selectHeader.setAttribute('scope', 'col');
+    selectHeader.innerHTML = 'Select';
+
     var titleHeader = document.createElement('th');
     titleHeader.setAttribute('scope', 'col');
     titleHeader.innerHTML = 'Title';
@@ -246,6 +255,7 @@ function displayAllItems(data) {
     userHeader.setAttribute('scope', 'col');
     userHeader.innerHTML = 'User';
 
+    headerRow.appendChild(selectHeader);
     headerRow.appendChild(titleHeader);
     headerRow.appendChild(descHeader);
     headerRow.appendChild(userHeader);
@@ -267,16 +277,45 @@ function displayAllItems(data) {
 
         var theCreator = data[i].creator;
 
+        var selectCol = document.createElement('td');
+        selectCol.setAttribute('scope', 'col');
+        selectCol.setAttribute('id', 'selectCol' +i);
+
+        var selectRadio  = document.createElement('input');
+        selectRadio.setAttribute('scope', 'radio');
+        selectRadio.setAttribute('type', 'radio');
+        selectRadio.setAttribute('name', 'radio');
+        selectRadio.setAttribute('id', 'radio' +i);
+        selectRadio.setAttribute('class', 'form-check-input');
+
+        selectCol.appendChild(selectRadio);
+        /*selectCol.setAttribute('id', 'checkbox' +i);
+        selectCol.setAttribute('class', 'form-check-input');
+        selectCol.setAttribute('type', 'checkbox');
+        selectCol.setAttribute('value', '');
+        selectCol.setAttribute('name', 'checkbox' +i);
+        //selectCol.setAttribute('style', 'background: white');*/
+
+        /*var selectLabel = document.createElement('label');
+        selectLabel.setAttribute('class', 'form-check-label text-white');
+        selectLabel.setAttribute('for', 'checbox' +i);*/
+
+        //selectCol.appendChild(selectLabel);
+
         var titleCol = document.createElement('td');
-        titleCol.setAttribute('id', 'title');
+        titleCol.setAttribute('scope', 'col');
+        titleCol.setAttribute('id', 'title' +i);
         titleCol.innerHTML = data[i].title;
         var descCol = document.createElement('td');
-        descCol.setAttribute('id', 'desc');
+        descCol.setAttribute('scope', 'col');
+        descCol.setAttribute('id', 'desc' +i);
         descCol.innerHTML = data[i].description;
         var userCol = document.createElement('td');
-        userCol.setAttribute('id', 'user');
+        userCol.setAttribute('scope', 'col');
+        userCol.setAttribute('id', 'user' +i);
         userCol.innerHTML = theCreator.username;
 
+        row.appendChild(selectCol);
         row.appendChild(titleCol);
         row.appendChild(descCol);
         row.appendChild(userCol);
