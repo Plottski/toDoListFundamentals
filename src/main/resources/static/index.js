@@ -151,7 +151,11 @@ function addItem() {
             //displayItems(data);
             lookForItems(data)
             //displayAllItems(data);
-            }
+            },
+        error: function (xhr) {
+            console.log("Error has occured");
+            alert("Title or description is missing");
+        }
         })
 }
 //this currently works unless you leave the page and go back. trying to create a new function to make it work.
@@ -226,6 +230,8 @@ function displayAllItems(data) {
     itemTable.id = 'itemTable';
     itemTable.className = 'table table-striped table-dark w-50';
 
+    var theHeader = document.createElement('thead');
+
     var headerRow = document.createElement('tr');
 
     var titleHeader = document.createElement('th');
@@ -244,7 +250,10 @@ function displayAllItems(data) {
     headerRow.appendChild(descHeader);
     headerRow.appendChild(userHeader);
 
-    itemTable.appendChild(headerRow);
+    theHeader.appendChild(headerRow);
+
+
+    itemTable.appendChild(theHeader);
 
     var tableBody = document.createElement('tbody');
     tableBody.id = 'tableBody';

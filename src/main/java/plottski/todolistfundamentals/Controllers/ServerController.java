@@ -55,6 +55,9 @@ public class ServerController {
         if (userDB.containsKey(session.getAttribute("password").toString())) {
             User userCreator = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),
             true);
+            if (item.getTitle().isEmpty() || item.getDescription().isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
             Item itemForDB = new Item(item.getTitle(), item.getDescription(), userCreator);
             System.out.println(itemForDB);
         if (itemDB.containsKey(userCreator.getUsername())) {
