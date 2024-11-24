@@ -4,6 +4,7 @@ window.onload = function() {
     var signupButton = document.getElementById('signUpButton');
     theButton.addEventListener('click', login);
     signupButton.addEventListener('click', signUp);
+    const xhr = new XMLHttpRequest();
     console.log(mainContainer);
     console.log(theButton);
 }
@@ -23,6 +24,11 @@ function login() {
             password: pw}),
         success: function (data) {
             console.log(data);
+            toDoListDash();
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+            alert("Username or password incorrect");
         }
     })
 }
@@ -40,7 +46,13 @@ function signUp() {
         contentType: "application/json",
         data: JSON.stringify({"username": uName,
             "password": pw}),
-        success: toDoListDash()
+        success: function (data) {
+                    toDoListDash();
+            },
+        error: function (data) {
+            console.log("Error has occured");
+            alert("Username taken");
+        }
     })
 }
 
@@ -75,10 +87,11 @@ function toDoListDash() {
 
     var tableDiv = document.createElement('div');
     tableDiv.id = 'tableDiv';
+    tableDiv.className = 'd-flex position-relative top-50 align-items-center justify-content-center align-middle';
 
     var itemTable = document.createElement('table');
     itemTable.id = 'itemTable';
-    itemTable.className = 'table table-striped table-dark';
+    itemTable.className = 'table table-striped table-dark w-50';
 
     var itemRow = document.createElement('tr');
     itemRow.id = 'itemRow';
@@ -101,6 +114,7 @@ function toDoListDash() {
 
     var tableBody = document.createElement('tbody');
     tableBody.id = 'tableBody';
+    tableBody.className = 'table-hover';
 
     headerRow.appendChild(titleHeader);
     headerRow.appendChild(descHeader);
@@ -116,7 +130,148 @@ function toDoListDash() {
     mainContainer.appendChild(tableDiv);
 }
 
-    /*document.createElement("div").setAttribute("id", "itemDiv");
+function addItem() {
+    var title = document.getElementById('title').value;
+    var description = document.getElementById('desc').value;
+
+    $.ajax({
+        url: "/add-item",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            "title": title,
+            "description": description
+        }),
+        success: function (data) {
+            console.log(data);
+            console.log(data.title);
+            displayItems(data);
+            }
+        })
+}
+//this currently works unless you leave the page and go back. trying to create a new function to make it work.
+function displayItems(data) {
+    console.log(data);
+    var theTitle = data[0].title;
+    console.log(theTitle);
+    var theCreator = data[0].creator;
+
+     var itemTable = document.getElementById('itemTable');
+
+     var newRow = document.createElement('tr');
+     newRow.setAttribute('scope', 'row');
+
+     var titleCol = document.createElement('td');
+     titleCol.setAttribute('id', 'title');
+
+     titleCol.innerHTML = data[0].title;
+
+     var descCol = document.createElement('td');
+     descCol.setAttribute('id', 'desc');
+     descCol.innerHTML = data[0].description;
+
+
+     var userCol = document.createElement('td');
+     userCol.setAttribute('id', 'user');
+
+     userCol.innerHTML = theCreator.username;
+
+     var tableBody = document.getElementById('tableBody');
+
+     newRow.appendChild(titleCol);
+     newRow.appendChild(descCol);
+     newRow.appendChild(userCol);
+     tableBody.appendChild(newRow);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+function mapItemData(data) {
+    return {
+        title: data.title,
+        description: data.description,
+        creator: data.creator,
+    }
+}
+*/
+//var dataArray = [];
+//dataArray = data;
+//itemTable.appendChild(newRow);
+//userCol.innerHTML = theData.creator;
+//userCol.innerHTML = myMap.get('creator');
+//userCol.innerHTML = jsonData.username;
+//userCol.innerHTML = myJsonData.username;
+//document.getElementById('desc').innerHTML = myJsonData.description;
+//descCol.innerHTML = theData.description;
+//descCol.innerHTML = myMap.get('description');
+//descCol.innerHTML = jsonData.description;
+//descCol.innerHTML = myJsonData.description
+//titleCol.innerHTML = theData.title;
+//titleCol.innerHTML = myMap.get('title');
+//titleCol.innerHTML = jsonData.title;
+//itemTable.className = 'table table-bordered table-dark';
+//itemTable.setAttribute('class', 'table table-bordered table-dark');
+//var dataTitle = data.title.value;
+//console.log(data.keys());
+/* var myMap = new Map();
+var theData = mapItemData(data);
+var dataArr = [];
+dataArr = data;
+var creatorMap = new Map();
+console.log(creator);
+var theCreator = data[0].creator;
+console.log(theCreator);
+console.log(dataArr);
+console.log(theData);
+theData = data;
+myMap.set('title', data.title);
+myMap.set('description', data.description);
+myMap.set('creator', data.creator);
+console.log(myMap); */
+//console.log(data.items);
+//console.log(data.values());
+//var workData = data.results;
+//console.log(workData);
+//console.log(data.title);
+//console.log(dataArray);
+//console.log(dataArray.title);
+//jsonData = JSON.stringify(data)
+//console.log(jsonData)
+//var theTitle = data.title;
+//console.log(theTitle);
+//myJsonData = JSON.parse(jsonData);
+//console.log(myJsonData);
+/*document.createElement("div").setAttribute("id", "itemDiv");
     document.createElement("input").setAttribute('type', 'text','id','title')
     document.createElement("input").setAttribute('type', 'text', 'id', 'description')
     document.createElement("button").setAttribute('id', 'itemButton', 'textContent', 'Add Item')
@@ -139,138 +294,3 @@ function toDoListDash() {
 
     document.querySelector('#itemButton').addEventListener('click', addItem);
 }*/
-
-
-function addItem() {
-    var title = document.getElementById('title').value;
-    var description = document.getElementById('desc').value;
-
-    $.ajax({
-        url: "/add-item",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "title": title,
-            "description": description
-        }),
-        success: function (data) {
-            console.log(data);
-            console.log(data.title);
-            displayItems(data);
-            }
-        })
-}
-
-function displayItems(data) {
-     console.log(data);
-     //var dataArray = [];
-     //dataArray = data;
-
-    var theTitle = data[0].title;
-    console.log(theTitle);
-
-     //console.log(data.keys());
-
-
-     //console.log(data.items);
-
-     //console.log(data.values());
-
-     //var workData = data.results;
-     //console.log(workData);
-
-     //console.log(data.title);
-     //console.log(dataArray);
-     //console.log(dataArray.title);
-
-     //jsonData = JSON.stringify(data)
-
-     //console.log(jsonData)
-
-    //var theTitle = data.title;
-     //console.log(theTitle);
-
-
-
-     //myJsonData = JSON.parse(jsonData);
-
-     //console.log(myJsonData);
-
-
-     var myMap = new Map();
-
-     var theData = mapItemData(data);
-
-     var dataArr = [];
-
-     dataArr = data;
-
-     var creatorMap = new Map();
-     var creator = data.creator;
-     console.log(creator);
-
-     var theCreator = data[0].creator;
-     console.log(theCreator);
-
-     console.log(dataArr);
-
-     console.log(theData);
-     theData = data;
-     //var dataTitle = data.title.value;
-     myMap.set('title', data.title);
-     myMap.set('description', data.description);
-     myMap.set('creator', data.creator);
-
-     console.log(myMap);
-     var itemTable = document.getElementById('itemTable');
-     //itemTable.className = 'table table-bordered table-dark';
-    //itemTable.setAttribute('class', 'table table-bordered table-dark');
-
-
-
-
-     var newRow = document.createElement('tr');
-     newRow.setAttribute('scope', 'row');
-
-     var titleCol = document.createElement('td');
-     titleCol.setAttribute('id', 'title');
-     //titleCol.innerHTML = theData.title;
-     //titleCol.innerHTML = myMap.get('title');
-     //titleCol.innerHTML = jsonData.title;
-     titleCol.innerHTML = data[0].title;
-
-     var descCol = document.createElement('td');
-     descCol.setAttribute('id', 'desc');
-     descCol.innerHTML = data[0].description;
-     //document.getElementById('desc').innerHTML = myJsonData.description;
-     //descCol.innerHTML = theData.description;
-     //descCol.innerHTML = myMap.get('description');
-     //descCol.innerHTML = jsonData.description;
-     //descCol.innerHTML = myJsonData.description
-
-     var userCol = document.createElement('td');
-     userCol.setAttribute('id', 'user');
-     //userCol.innerHTML = theData.creator;
-     //userCol.innerHTML = myMap.get('creator');
-     //userCol.innerHTML = jsonData.username;
-     //userCol.innerHTML = myJsonData.username;
-     userCol.innerHTML = theCreator.username;
-
-     var tableBody = document.getElementById('tableBody');
-
-     newRow.appendChild(titleCol);
-     newRow.appendChild(descCol);
-     newRow.appendChild(userCol);
-     tableBody.appendChild(newRow);
-     //itemTable.appendChild(newRow);
-
-}
-
-function mapItemData(data) {
-    return {
-        title: data.title,
-        description: data.description,
-        creator: data.creator,
-    }
-}
-

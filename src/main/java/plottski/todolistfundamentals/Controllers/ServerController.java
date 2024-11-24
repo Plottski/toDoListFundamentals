@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class ServerController {
 
     private final HashMap<String, User> userDB = new HashMap<String, User>();
-    private final HashMap<User, ArrayList<Item>> itemDB = new HashMap<User, ArrayList<Item>>();
+    private final HashMap<String, ArrayList<Item>> itemDB = new HashMap<String, ArrayList<Item>>();
 
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
     public ResponseEntity<User> userSignUp(HttpSession session, @RequestBody User user) {
@@ -53,16 +53,17 @@ public class ServerController {
             true);
             Item itemForDB = new Item(item.getTitle(), item.getDescription(), userCreator);
             System.out.println(itemForDB);
-        if (itemDB.containsKey(userCreator)) {
-            ArrayList<Item> userItems = itemDB.get(userCreator);
+        if (itemDB.containsKey(userCreator.getUsername())) {
+            ArrayList<Item> userItems = itemDB.get(userCreator.getUsername());
             userItems.add(itemForDB);
-            itemDB.replace(userCreator, userItems);
+            System.out.println(userItems);
+            itemDB.replace(userCreator.getUsername(), userItems);
             return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
         }
         else {
             ArrayList<Item> newUserItems = new ArrayList<>();
             newUserItems.add(itemForDB);
-            itemDB.put(userCreator, newUserItems);
+            itemDB.put(userCreator.getUsername(), newUserItems);
             return new ResponseEntity<ArrayList<Item>>(newUserItems, HttpStatus.OK);
             }
         }
@@ -74,11 +75,11 @@ public class ServerController {
         if (userDB.containsKey(session.getAttribute("password").toString())) {
             //User userDeleter = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),true);
             User user = userDB.get(session.getAttribute("password").toString());
-            ArrayList<Item> userItems = itemDB.get(user);
+            ArrayList<Item> userItems = itemDB.get(user.getUsername());
             for (int i = 0; i < userItems.size(); i++) {
                 if (userItems.contains(item.getTitle())) {
                     userItems.remove(item);
-                    itemDB.put(user, userItems);
+                    itemDB.put(user.getUsername(), userItems);
                     return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
                 }
             }
