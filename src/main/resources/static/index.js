@@ -125,6 +125,8 @@ function addItem() {
             "description": description
         }),
         success: function (data) {
+            console.log(data);
+            console.log(data.title);
             displayItems(data);
             }
         })
@@ -132,14 +134,38 @@ function addItem() {
 
 function displayItems(data) {
      console.log(data);
+     //var dataArray = [];
+     //dataArray = data;
 
-     jsonData = JSON.stringify(data)
+    var theTitle = data[0].title;
+    console.log(theTitle);
 
-     console.log(jsonData)
+     //console.log(data.keys());
 
-     myJsonData = JSON.parse(jsonData);
 
-     console.log(myJsonData);
+     //console.log(data.items);
+
+     //console.log(data.values());
+
+     //var workData = data.results;
+     //console.log(workData);
+
+     //console.log(data.title);
+     //console.log(dataArray);
+     //console.log(dataArray.title);
+
+     //jsonData = JSON.stringify(data)
+
+     //console.log(jsonData)
+
+    //var theTitle = data.title;
+     //console.log(theTitle);
+
+
+
+     //myJsonData = JSON.parse(jsonData);
+
+     //console.log(myJsonData);
 
 
      var myMap = new Map();
@@ -149,6 +175,13 @@ function displayItems(data) {
      var dataArr = [];
 
      dataArr = data;
+
+     var creatorMap = new Map();
+     var creator = data.creator;
+     console.log(creator);
+
+     var theCreator = data[0].creator;
+     console.log(theCreator);
 
      console.log(dataArr);
 
@@ -166,24 +199,28 @@ function displayItems(data) {
      var newRow = document.createElement('tr');
 
      var titleCol = document.createElement('td');
+     titleCol.setAttribute('id', 'title');
      //titleCol.innerHTML = theData.title;
      //titleCol.innerHTML = myMap.get('title');
      //titleCol.innerHTML = jsonData.title;
-     titleCol.innerHTML = myJsonData.title;
+     titleCol.innerHTML = data[0].title;
 
      var descCol = document.createElement('td');
      descCol.setAttribute('id', 'desc');
-     document.getElementById('desc').innerHTML = myJsonData.description;
+     descCol.innerHTML = data[0].description;
+     //document.getElementById('desc').innerHTML = myJsonData.description;
      //descCol.innerHTML = theData.description;
      //descCol.innerHTML = myMap.get('description');
      //descCol.innerHTML = jsonData.description;
      //descCol.innerHTML = myJsonData.description
 
      var userCol = document.createElement('td');
+     userCol.setAttribute('id', 'user');
      //userCol.innerHTML = theData.creator;
      //userCol.innerHTML = myMap.get('creator');
      //userCol.innerHTML = jsonData.username;
-     userCol.innerHTML = myJsonData.username;
+     //userCol.innerHTML = myJsonData.username;
+     userCol.innerHTML = theCreator.username;
 
      newRow.appendChild(titleCol);
      newRow.appendChild(descCol);
