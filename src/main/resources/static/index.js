@@ -78,9 +78,38 @@ function toDoListDash() {
 
     var itemTable = document.createElement('table');
     itemTable.id = 'itemTable';
+    itemTable.className = 'table table-striped table-dark';
 
     var itemRow = document.createElement('tr');
     itemRow.id = 'itemRow';
+
+    var tableHeader = document.createElement('thead');
+
+    var headerRow = document.createElement('tr');
+
+    var titleHeader = document.createElement('th');
+    titleHeader.setAttribute('scope', 'col');
+    titleHeader.innerHTML = 'Title';
+
+    var descHeader = document.createElement('th');
+    descHeader.setAttribute('scope', 'col');
+    descHeader.innerHTML = 'Description';
+
+    var userHeader = document.createElement('th');
+    userHeader.setAttribute('scope', 'col');
+    userHeader.innerHTML = 'User';
+
+    var tableBody = document.createElement('tbody');
+    tableBody.id = 'tableBody';
+
+    headerRow.appendChild(titleHeader);
+    headerRow.appendChild(descHeader);
+    headerRow.appendChild(userHeader);
+
+    tableHeader.appendChild(headerRow);
+
+    itemTable.appendChild(tableHeader);
+    itemTable.appendChild(tableBody);
 
     tableDiv.appendChild(itemTable);
 
@@ -194,9 +223,14 @@ function displayItems(data) {
 
      console.log(myMap);
      var itemTable = document.getElementById('itemTable');
+     //itemTable.className = 'table table-bordered table-dark';
+    //itemTable.setAttribute('class', 'table table-bordered table-dark');
+
+
 
 
      var newRow = document.createElement('tr');
+     newRow.setAttribute('scope', 'row');
 
      var titleCol = document.createElement('td');
      titleCol.setAttribute('id', 'title');
@@ -222,10 +256,13 @@ function displayItems(data) {
      //userCol.innerHTML = myJsonData.username;
      userCol.innerHTML = theCreator.username;
 
+     var tableBody = document.getElementById('tableBody');
+
      newRow.appendChild(titleCol);
      newRow.appendChild(descCol);
      newRow.appendChild(userCol);
-     itemTable.appendChild(newRow);
+     tableBody.appendChild(newRow);
+     //itemTable.appendChild(newRow);
 
 }
 
