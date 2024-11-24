@@ -24,7 +24,8 @@ function login() {
             password: pw}),
         success: function (data) {
             console.log(data);
-            toDoListDash();
+            lookForItems(data);
+           // toDoListDash();
         },
         error: function (xhr) {
             console.log("Error has occured");
@@ -128,6 +129,8 @@ function toDoListDash() {
     tableDiv.appendChild(itemTable);
 
     mainContainer.appendChild(tableDiv);
+
+
 }
 
 function addItem() {
@@ -144,8 +147,10 @@ function addItem() {
         }),
         success: function (data) {
             console.log(data);
-            console.log(data.title);
-            displayItems(data);
+            //console.log(data.title);
+            //displayItems(data);
+            lookForItems(data)
+            //displayAllItems(data);
             }
         })
 }
@@ -184,8 +189,111 @@ function displayItems(data) {
      tableBody.appendChild(newRow);
 }
 
+function displayAllItems(data) {
+    //var tableBody = document.getElementById('tableBody');
+    //tableBody.innerHTML = '';
+    mainContainer.innerHTML = '';
+    var firstDiv = document.createElement('div');
+    firstDiv.id = 'itemDiv';
 
+    var titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.placeholder = 'Title of item';
+    titleInput.id = 'title';
 
+    var descInput = document.createElement('input');
+    descInput.type = 'text';
+    descInput.placeholder = 'Description of item';
+    descInput.id = 'desc';
+
+    var addButton = document.createElement('button');
+    addButton.type = 'button';
+    addButton.id = 'itemButton';
+    addButton.innerHTML = 'Add';
+    addButton.addEventListener('click', addItem);
+
+    firstDiv.appendChild(titleInput);
+    firstDiv.appendChild(descInput);
+    firstDiv.appendChild(addButton);
+
+    mainContainer.appendChild(firstDiv);
+
+    var tableDiv = document.createElement('div');
+    tableDiv.id = 'tableDiv';
+    tableDiv.className = 'd-flex position-relative top-50 align-items-center justify-content-center align-middle';
+
+    var itemTable = document.createElement('table');
+    itemTable.id = 'itemTable';
+    itemTable.className = 'table table-striped table-dark w-50';
+
+    var headerRow = document.createElement('tr');
+
+    var titleHeader = document.createElement('th');
+    titleHeader.setAttribute('scope', 'col');
+    titleHeader.innerHTML = 'Title';
+
+    var descHeader = document.createElement('th');
+    descHeader.setAttribute('scope', 'col');
+    descHeader.innerHTML = 'Description';
+
+    var userHeader = document.createElement('th');
+    userHeader.setAttribute('scope', 'col');
+    userHeader.innerHTML = 'User';
+
+    headerRow.appendChild(titleHeader);
+    headerRow.appendChild(descHeader);
+    headerRow.appendChild(userHeader);
+
+    itemTable.appendChild(headerRow);
+
+    var tableBody = document.createElement('tbody');
+    tableBody.id = 'tableBody';
+    tableBody.className = 'table-hover';
+
+    //var itemTable = document.getElementById('itemTable');
+
+    for (var i = 0; i < data.length; i++) {
+        var row = document.createElement('tr');
+        row.setAttribute('scope', 'row');
+
+        var theCreator = data[i].creator;
+
+        var titleCol = document.createElement('td');
+        titleCol.setAttribute('id', 'title');
+        titleCol.innerHTML = data[i].title;
+        var descCol = document.createElement('td');
+        descCol.setAttribute('id', 'desc');
+        descCol.innerHTML = data[i].description;
+        var userCol = document.createElement('td');
+        userCol.setAttribute('id', 'user');
+        userCol.innerHTML = theCreator.username;
+
+        row.appendChild(titleCol);
+        row.appendChild(descCol);
+        row.appendChild(userCol);
+        tableBody.appendChild(row);
+    }
+    itemTable.appendChild(tableBody);
+    tableDiv.appendChild(itemTable);
+    mainContainer.appendChild(tableDiv);
+}
+
+function lookForItems(data) {
+    var uName = data.username;
+    $.ajax({
+        url: "/get-all-items",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({username: uName}),
+        success: function (data) {
+            displayAllItems(data);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+            alert("Something shit the bed");
+        }
+    })
+}
 
 
 

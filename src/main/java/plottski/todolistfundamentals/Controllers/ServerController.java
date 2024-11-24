@@ -38,6 +38,10 @@ public class ServerController {
             session.setAttribute("username", user.getUsername());
             session.setAttribute("password", user.getPassword());
             session.setAttribute("loggedin", true);
+           // if (itemDB.containsKey(user.getUsername())) {
+           //     ArrayList<Item> userItems = itemDB.get(user.getUsername());
+           //     return new ResponseEntity<>(userItems, HttpStatus.OK);
+           // }
             return new ResponseEntity<User>(user, HttpStatus.OK);
         } else if (userDB == null) {
             return new ResponseEntity<User>(HttpStatus.CONFLICT);
@@ -70,7 +74,7 @@ public class ServerController {
         return new ResponseEntity<ArrayList<Item>>(HttpStatus.FORBIDDEN);
     }
 
-    @RequestMapping(path = "delete-item", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
     public ResponseEntity<ArrayList<Item>> deleteUserItems(HttpSession session, @RequestBody Item item) {
         if (userDB.containsKey(session.getAttribute("password").toString())) {
             //User userDeleter = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),true);
@@ -85,5 +89,18 @@ public class ServerController {
             }
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<Item>> allUserItems(HttpSession session, @RequestBody User user) {
+        if (userDB.containsKey(session.getAttribute("password").toString())) {
+            User userFromDB = userDB.get(session.getAttribute("password").toString());
+            if (itemDB.containsKey(userFromDB.getUsername())) {
+                ArrayList<Item> userItems = itemDB.get(userFromDB.getUsername());
+                return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
+            }
+            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
