@@ -201,6 +201,9 @@ function displayItems(data) {
 function displayAllItems(data) {
     //var tableBody = document.getElementById('tableBody');
     //tableBody.innerHTML = '';
+
+    var creator = data[0].creator;
+    var creatorName = creator.username;
     mainContainer.innerHTML = '';
     var firstDiv = document.createElement('div');
     firstDiv.id = 'itemDiv';
@@ -226,6 +229,24 @@ function displayAllItems(data) {
     firstDiv.appendChild(addButton);
 
     mainContainer.appendChild(firstDiv);
+
+    var logoutDiv = document.createElement('div');
+    logoutDiv.setAttribute('margin-right', '0');
+    logoutDiv.id = 'logoutDiv';
+
+    var logoutButton = document.createElement('button');
+    logoutButton.type = 'button';
+    logoutButton.id = 'logoutButton';
+    logoutButton.innerHTML = 'Logout';
+    //logoutButton.addEventListener('click', userLogout(creatorName));
+    logoutButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        userLogout(creatorName);
+    })
+
+    logoutDiv.appendChild(logoutButton);
+
+    mainContainer.appendChild(logoutDiv);
 
     var tableDiv = document.createElement('div');
     tableDiv.id = 'tableDiv';
@@ -341,6 +362,51 @@ function lookForItems(data) {
             alert("Something shit the bed");
         }
     })
+}
+
+function userLogout(creatorName) {
+    //var uName = data.username;
+    $.ajax({
+        url: "/logout",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({username: creatorName}),
+        success: function (data) {
+            resetHTML();
+        }
+    })
+}
+
+function resetHTML() {
+    var userInput = document.createElement('input');
+    userInput.setAttribute('type', 'text');
+    userInput.setAttribute('placeholder', 'Username');
+    userInput.setAttribute('id', 'username');
+
+    var userPasswordInput = document.createElement('input');
+    userPasswordInput.setAttribute('type', 'password');
+    userPasswordInput.setAttribute('placeholder', 'Password');
+    userPasswordInput.setAttribute('id', 'password');
+
+    var loginButton = document.createElement('button');
+    loginButton.setAttribute('type', 'button');
+    loginButton.setAttribute('id', 'loginButton');
+    loginButton.addEventListener('click', login)
+    loginButton.innerHTML = 'Login';
+
+    var signUpButton = document.createElement('button');
+    signUpButton.setAttribute('type', 'button');
+    signUpButton.setAttribute('id', 'signUpButton');
+    signUpButton.addEventListener('click', signUp);
+    signUpButton.innerHTML = 'Sign Up';
+
+    mainContainer.innerHTML = '';
+
+    mainContainer.appendChild(userInput);
+    mainContainer.appendChild(userPasswordInput);
+    mainContainer.appendChild(loginButton);
+    mainContainer.appendChild(signUpButton);
+
 }
 
 

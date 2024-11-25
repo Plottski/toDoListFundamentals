@@ -106,4 +106,18 @@ public class ServerController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @RequestMapping(path = "/logout", method = RequestMethod.POST)
+    public ResponseEntity<User> userLogout(HttpSession session, @RequestBody User user) {
+        if (userDB.containsKey(session.getAttribute("password").toString())) {
+            User userFromDB = userDB.get(session.getAttribute("password").toString());
+            userFromDB.setLoggedIn(false);
+            userDB.replace(userFromDB.getPassword(), userFromDB);
+            User emptyUser = new User(null, null, false);
+            //return new ResponseEntity<User>(emptyUser, HttpStatus.OK);\
+            System.out.println("you are hitting the endpoint successfully");
+            return null;
+        }
+        return null;
+    }
 }
