@@ -3,9 +3,8 @@ package plottski.todolistfundamentals.Services;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import plottski.todolistfundamentals.Entities.ItemWithCreationDate;
-
 import java.util.ArrayList;
-import java.util.Optional;
+
 
 public interface ItemDB extends CrudRepository<ItemWithCreationDate, Integer> {
     //ItemWithCreationDate findByTitle(String title);

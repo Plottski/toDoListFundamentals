@@ -1,6 +1,5 @@
 package plottski.todolistfundamentals.Controllers;
 
-
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,12 +11,9 @@ import plottski.todolistfundamentals.Entities.User;
 import plottski.todolistfundamentals.Entities.UserForDB;
 import plottski.todolistfundamentals.Services.ItemDB;
 import plottski.todolistfundamentals.Services.UserRepo;
-
-import java.lang.reflect.Array;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 public class ServerController {
@@ -55,7 +51,92 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    /*@RequestMapping(path = "/signup", method = RequestMethod.POST)
+
+    @RequestMapping(path = "/add-item", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<ItemWithCreationDate>> userItems(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        theItem.setUserID(userFromDB.getId());
+        theItem.setUsername(userFromDB.getUsername());
+        Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
+        items.save(theItem);
+        if (userFromDB != null) {
+            ArrayList<ItemWithCreationDate> dbItems = dbItems = items.findAll();
+            for (int i = 0; i < dbItems.size(); i++) {
+                if (dbItems.get(i).getUserID() != userFromDB.getId()) {
+                    System.out.println(dbItems.get(i));
+                    dbItems.remove(i);
+                }
+            }
+            return new ResponseEntity<ArrayList<ItemWithCreationDate>>(dbItems, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
+    public ResponseEntity<ArrayList<Item>> deleteUserItems(HttpSession session, @RequestBody Item item) {
+        if (userDB.containsKey(session.getAttribute("password").toString())) {
+            //User userDeleter = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),true);
+            User user = userDB.get(session.getAttribute("password").toString());
+            ArrayList<Item> userItems = itemDB.get(user.getUsername());
+            for (int i = 0; i < userItems.size(); i++) {
+                if (userItems.contains(item.getTitle())) {
+                    userItems.remove(item);
+                    itemDB.put(user.getUsername(), userItems);
+                    return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
+                }
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<ItemWithCreationDate>> allUserItems(HttpSession session, @RequestBody UserForDB user) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (userFromDB != null) {
+            ArrayList<ItemWithCreationDate> dbItems = items.findAll();
+            for (int i = 0; i < dbItems.size(); i++) {
+                if (dbItems.get(i).getUserID() != userFromDB.getId()) {
+                    System.out.println(dbItems.get(i));
+                    dbItems.remove(i);
+                }
+            }
+            return new ResponseEntity<ArrayList<ItemWithCreationDate>>(dbItems, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @RequestMapping(path = "/logout", method = RequestMethod.POST)
+    public ResponseEntity<User> userLogout(HttpSession session, @RequestBody User user) {
+        if (userDB.containsKey(session.getAttribute("password").toString())) {
+            User userFromDB = userDB.get(session.getAttribute("password").toString());
+            userFromDB.setLoggedIn(false);
+            userDB.replace(userFromDB.getPassword(), userFromDB);
+            User emptyUser = new User(null, null, false);
+            //return new ResponseEntity<User>(emptyUser, HttpStatus.OK);\
+            System.out.println("you are hitting the endpoint successfully");
+            return null;
+        }
+        return null;
+    }
+}
+
+ /*
+    @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<Item>> allUserItems(HttpSession session, @RequestBody User user) {
+        if (userDB.containsKey(session.getAttribute("password").toString())) {
+            User userFromDB = userDB.get(session.getAttribute("password").toString());
+            if (itemDB.containsKey(userFromDB.getUsername())) {
+                ArrayList<Item> userItems = itemDB.get(userFromDB.getUsername());
+                return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
+            }
+            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } */
+
+//all deprecated code from hashmap database simulation.
+
+/*@RequestMapping(path = "/signup", method = RequestMethod.POST)
     public ResponseEntity<User> userSignUp(HttpSession session, @RequestBody User user) {
         System.out.println(user.getUsername());
         //Trying to add persistance
@@ -130,84 +211,3 @@ public class ServerController {
         return new ResponseEntity<ArrayList<Item>>(HttpStatus.FORBIDDEN);
     } */
 
-    @RequestMapping(path = "/add-item", method = RequestMethod.POST)
-    public ResponseEntity<ArrayList<ItemWithCreationDate>> userItems(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
-        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        theItem.setUserID(userFromDB.getId());
-        theItem.setUsername(userFromDB.getUsername());
-        Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
-        items.save(theItem);
-        if (userFromDB != null) {
-            ArrayList<ItemWithCreationDate> dbItems = dbItems = items.findAll();
-            for (int i = 0; i < dbItems.size(); i++) {
-                if (dbItems.get(i).getUserID() != userFromDB.getId()) {
-                    System.out.println(dbItems.get(i));
-                    dbItems.remove(i);
-                }
-            }
-            return new ResponseEntity<ArrayList<ItemWithCreationDate>>(dbItems, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }
-
-    @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
-    public ResponseEntity<ArrayList<Item>> deleteUserItems(HttpSession session, @RequestBody Item item) {
-        if (userDB.containsKey(session.getAttribute("password").toString())) {
-            //User userDeleter = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),true);
-            User user = userDB.get(session.getAttribute("password").toString());
-            ArrayList<Item> userItems = itemDB.get(user.getUsername());
-            for (int i = 0; i < userItems.size(); i++) {
-                if (userItems.contains(item.getTitle())) {
-                    userItems.remove(item);
-                    itemDB.put(user.getUsername(), userItems);
-                    return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
-                }
-            }
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }
-
-    /*
-    @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
-    public ResponseEntity<ArrayList<Item>> allUserItems(HttpSession session, @RequestBody User user) {
-        if (userDB.containsKey(session.getAttribute("password").toString())) {
-            User userFromDB = userDB.get(session.getAttribute("password").toString());
-            if (itemDB.containsKey(userFromDB.getUsername())) {
-                ArrayList<Item> userItems = itemDB.get(userFromDB.getUsername());
-                return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
-            }
-            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } */
-
-    @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
-    public ResponseEntity<ArrayList<ItemWithCreationDate>> allUserItems(HttpSession session, @RequestBody UserForDB user) {
-        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        if (userFromDB != null) {
-            ArrayList<ItemWithCreationDate> dbItems = items.findAll();
-            for (int i = 0; i < dbItems.size(); i++) {
-                if (dbItems.get(i).getUserID() != userFromDB.getId()) {
-                    System.out.println(dbItems.get(i));
-                    dbItems.remove(i);
-                }
-            }
-            return new ResponseEntity<ArrayList<ItemWithCreationDate>>(dbItems, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }
-
-    @RequestMapping(path = "/logout", method = RequestMethod.POST)
-    public ResponseEntity<User> userLogout(HttpSession session, @RequestBody User user) {
-        if (userDB.containsKey(session.getAttribute("password").toString())) {
-            User userFromDB = userDB.get(session.getAttribute("password").toString());
-            userFromDB.setLoggedIn(false);
-            userDB.replace(userFromDB.getPassword(), userFromDB);
-            User emptyUser = new User(null, null, false);
-            //return new ResponseEntity<User>(emptyUser, HttpStatus.OK);\
-            System.out.println("you are hitting the endpoint successfully");
-            return null;
-        }
-        return null;
-    }
-}
