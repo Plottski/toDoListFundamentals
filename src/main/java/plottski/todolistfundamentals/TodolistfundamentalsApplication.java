@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 //@Configuration
-@EnableJpaRepositories
+//@EnableJpaRepositories
 //@EntityScan("plottski.todolistfundamentals.Entities")
 public class TodolistfundamentalsApplication {
 

@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 //@Repository
-//@RepositoryRestResource(collectionResourceRel = "users", path = "users")
-public interface UserRepo extends PagingAndSortingRepository<UserForDB, Integer>, JpaRepository<UserForDB, Integer> {
+//@RepositoryRestResource(collectionResourceRel = "users", path = "users") PagingAndSortingRepository<UserForDB, Integer>,
+public interface UserRepo extends CrudRepository<UserForDB, Integer> {
 
     UserForDB findByUsername(String username);
 

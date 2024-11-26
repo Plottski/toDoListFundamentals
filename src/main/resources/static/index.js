@@ -117,6 +117,10 @@ function toDoListDash() {
     userHeader.setAttribute('scope', 'col');
     userHeader.innerHTML = 'User';
 
+    var timeHeader = document.createElement('th');
+    timeHeader.setAttribute('scope', 'col');
+    timeHeader.innerHTML = 'Created';
+
     var tableBody = document.createElement('tbody');
     tableBody.id = 'tableBody';
     tableBody.className = 'table-hover';
@@ -125,6 +129,7 @@ function toDoListDash() {
     headerRow.appendChild(titleHeader);
     headerRow.appendChild(descHeader);
     headerRow.appendChild(userHeader);
+    headerRow.appendChild(timeHeader);
 
     tableHeader.appendChild(headerRow);
 
@@ -141,6 +146,8 @@ function toDoListDash() {
 function addItem() {
     var title = document.getElementById('title').value;
     var description = document.getElementById('desc').value;
+    var creationDate = Date.now();
+    console.log(creationDate);
 
     $.ajax({
         url: "/add-item",
@@ -148,7 +155,8 @@ function addItem() {
         contentType: "application/json",
         data: JSON.stringify({
             "title": title,
-            "description": description
+            "description": description,
+            "creationTime": creationDate,
         }),
         success: function (data) {
             console.log(data);
@@ -203,7 +211,7 @@ function displayAllItems(data) {
     //tableBody.innerHTML = '';
 
     var creator = data[0].creator;
-    var creatorName = creator.username;
+    //var creatorName = username;
     mainContainer.innerHTML = '';
     var firstDiv = document.createElement('div');
     firstDiv.id = 'itemDiv';
@@ -276,10 +284,15 @@ function displayAllItems(data) {
     userHeader.setAttribute('scope', 'col');
     userHeader.innerHTML = 'User';
 
+    var timeHeader = document.createElement('th');
+    timeHeader.setAttribute('scope', 'col');
+    timeHeader.innerHTML = 'Created';
+
     headerRow.appendChild(selectHeader);
     headerRow.appendChild(titleHeader);
     headerRow.appendChild(descHeader);
     headerRow.appendChild(userHeader);
+    headerRow.appendChild(timeHeader);
 
     theHeader.appendChild(headerRow);
 
@@ -323,6 +336,8 @@ function displayAllItems(data) {
 
         //selectCol.appendChild(selectLabel);
 
+        var date = new Date(data[i].creationTime);
+
         var titleCol = document.createElement('td');
         titleCol.setAttribute('scope', 'col');
         titleCol.setAttribute('id', 'title' +i);
@@ -334,12 +349,22 @@ function displayAllItems(data) {
         var userCol = document.createElement('td');
         userCol.setAttribute('scope', 'col');
         userCol.setAttribute('id', 'user' +i);
-        userCol.innerHTML = theCreator.username;
+        //userCol.innerHTML = theCreator.username;
+        userCol.innerHTML = data[i].username;
+        var timeCol = document.createElement('td');
+        timeCol.setAttribute('scope', 'col');
+        timeCol.setAttribute('id', 'time' +i);
+        timeCol.innerHTML = date.toLocaleDateString('en-US');
+        //timeCol.innerHTML = date;
+        //timeCol.innerHtml = Date(data[i].creationTime);
+
+        console.log(data[i].creationTime);
 
         row.appendChild(selectCol);
         row.appendChild(titleCol);
         row.appendChild(descCol);
         row.appendChild(userCol);
+        row.appendChild(timeCol);
         tableBody.appendChild(row);
     }
     itemTable.appendChild(tableBody);

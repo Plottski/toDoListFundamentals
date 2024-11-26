@@ -7,12 +7,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import plottski.todolistfundamentals.Entities.Item;
+import plottski.todolistfundamentals.Entities.ItemWithCreationDate;
 import plottski.todolistfundamentals.Entities.User;
 import plottski.todolistfundamentals.Entities.UserForDB;
+import plottski.todolistfundamentals.Services.ItemDB;
 import plottski.todolistfundamentals.Services.UserRepo;
 
+import java.lang.reflect.Array;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 public class ServerController {
@@ -20,10 +25,37 @@ public class ServerController {
     @Autowired
     UserRepo users;
 
+    @Autowired
+    ItemDB items;
+
     private final HashMap<String, User> userDB = new HashMap<String, User>();
     private final HashMap<String, ArrayList<Item>> itemDB = new HashMap<String, ArrayList<Item>>();
 
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
+    public ResponseEntity<UserForDB> userSignUp(HttpSession session, @RequestBody UserForDB user) {
+        if (users.findByUsername(user.getUsername()) == null) {
+            UserForDB userForDB = new UserForDB(user.getUsername(), user.getPassword(), "plottski@gmail.com", true);
+            users.save(userForDB);
+            session.setAttribute("username", userForDB.getUsername());
+            return new ResponseEntity<UserForDB>(user, HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @RequestMapping(path = "/login", method = RequestMethod.POST)
+    public ResponseEntity<UserForDB> userLogin(HttpSession session, @RequestBody UserForDB user) {
+        if (users.findByUsername(user.getUsername()) != null) {
+            UserForDB userFromDB = users.findByUsername(user.getUsername());
+            userFromDB.setLoggedIn(true);
+            session.setAttribute("username", userFromDB.getUsername());
+            return new ResponseEntity<UserForDB>(userFromDB, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    /*@RequestMapping(path = "/signup", method = RequestMethod.POST)
     public ResponseEntity<User> userSignUp(HttpSession session, @RequestBody User user) {
         System.out.println(user.getUsername());
         //Trying to add persistance
@@ -39,6 +71,7 @@ public class ServerController {
         else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+
         if (userDB.containsKey(user.getPassword())) {
             return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
         }
@@ -68,9 +101,9 @@ public class ServerController {
         }
         return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
 
-    }
+    } */
 
-    @RequestMapping(path = "/add-item", method = RequestMethod.POST)
+   /* @RequestMapping(path = "/add-item", method = RequestMethod.POST)
     public ResponseEntity<ArrayList<Item>> userItems(HttpSession session, @RequestBody Item item) {
         if (userDB.containsKey(session.getAttribute("password").toString())) {
             User userCreator = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),
@@ -95,6 +128,26 @@ public class ServerController {
             }
         }
         return new ResponseEntity<ArrayList<Item>>(HttpStatus.FORBIDDEN);
+    } */
+
+    @RequestMapping(path = "/add-item", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<ItemWithCreationDate>> userItems(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        theItem.setUserID(userFromDB.getId());
+        theItem.setUsername(userFromDB.getUsername());
+        Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
+        items.save(theItem);
+        if (userFromDB != null) {
+            ArrayList<ItemWithCreationDate> dbItems = dbItems = items.findAll();
+            for (int i = 0; i < dbItems.size(); i++) {
+                if (dbItems.get(i).getUserID() != userFromDB.getId()) {
+                    System.out.println(dbItems.get(i));
+                    dbItems.remove(i);
+                }
+            }
+            return new ResponseEntity<ArrayList<ItemWithCreationDate>>(dbItems, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
@@ -114,6 +167,7 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
+    /*
     @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
     public ResponseEntity<ArrayList<Item>> allUserItems(HttpSession session, @RequestBody User user) {
         if (userDB.containsKey(session.getAttribute("password").toString())) {
@@ -125,6 +179,22 @@ public class ServerController {
             else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } */
+
+    @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<ItemWithCreationDate>> allUserItems(HttpSession session, @RequestBody UserForDB user) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (userFromDB != null) {
+            ArrayList<ItemWithCreationDate> dbItems = items.findAll();
+            for (int i = 0; i < dbItems.size(); i++) {
+                if (dbItems.get(i).getUserID() != userFromDB.getId()) {
+                    System.out.println(dbItems.get(i));
+                    dbItems.remove(i);
+                }
+            }
+            return new ResponseEntity<ArrayList<ItemWithCreationDate>>(dbItems, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @RequestMapping(path = "/logout", method = RequestMethod.POST)
