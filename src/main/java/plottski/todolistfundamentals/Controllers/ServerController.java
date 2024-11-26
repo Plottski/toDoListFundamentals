@@ -2,11 +2,14 @@ package plottski.todolistfundamentals.Controllers;
 
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import plottski.todolistfundamentals.Entities.Item;
 import plottski.todolistfundamentals.Entities.User;
+import plottski.todolistfundamentals.Entities.UserForDB;
+import plottski.todolistfundamentals.Services.UserRepo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,12 +17,28 @@ import java.util.HashMap;
 @RestController
 public class ServerController {
 
+    @Autowired
+    UserRepo users;
+
     private final HashMap<String, User> userDB = new HashMap<String, User>();
     private final HashMap<String, ArrayList<Item>> itemDB = new HashMap<String, ArrayList<Item>>();
 
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
     public ResponseEntity<User> userSignUp(HttpSession session, @RequestBody User user) {
         System.out.println(user.getUsername());
+        //Trying to add persistance
+        if (users.findByUsername(user.getUsername()) == null) {
+            user.setLoggedIn(true);
+            UserForDB userForDB = new UserForDB(user.getUsername(), user.getPassword(), "plottski@gmail.com", true);
+            users.save(userForDB);
+            System.out.println("user saved successfully");
+            UserForDB userDBTest = users.findByUsername(user.getUsername());
+            System.out.println(userDBTest);
+            System.out.println(userDBTest.getUsername());
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         if (userDB.containsKey(user.getPassword())) {
             return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
         }
@@ -27,6 +46,7 @@ public class ServerController {
         session.setAttribute("username", user.getUsername());
         session.setAttribute("password", user.getPassword());
         user.setLoggedIn(true);
+        //users.save(user);
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
