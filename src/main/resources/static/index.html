@@ -7,14 +7,60 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <script src="jquery-3.7.1.min.js"></script>
     <script src="index.js"></script>
+    <link rel="stylesheet" href="index.css" />
     <title>Title</title>
 </head>
 <body id="mainContainer">
+<div class="jumbotron" id="jumbotron">
+    <h1>Welcome to the To Do List!</h1>
+    <p>
+        This is a work in progress.
+    </p>
+</div>
 
-<input id="username" type="text" placeholder="Username"/>
-<input id="password" type="password" placeholder="Password"/>
-<button id="loginButton">Login</button>
-<button id="signUpButton">Signup!</button>
+<div id="componentDiv" class="container">
+<div id="featureContainer" class="col-md-3">
+    <ul id="features" class="shadow">Features to be Added
+        <br>
+        <li>Continuous Database Persistance</li>
+        <li>Sorting System</li>
+        <li>Filtering System</li>
+        <li>Collaborator System</li>
+        <li>Row Styling</li>
+        <li>Item Deletion</li>
+        <li>Multiple Users</li>
+        <li>User Management</li>
+        <li>User Auth</li>
+        <li>Excel Exportation</li>
+    </ul>
+</div>
+<div id="userDiv" class="container col-md-2">
+    <div id="userInfo" class="col-md-2">
+        <input id="username" type="text" placeholder="Username"/>
+    </div>
+</div>
 
+<div id="passwordUser" class="container col-md-2">
+    <div id="userPass" class="col-md-2">
+        <input id="password" type="password" placeholder="Password"/>
+    </div>
+</div>
+
+<div id="loginForUser" class="container row">
+    <div id="userLoginButton" class="col-md-1">
+        <button id="loginButton" class="btn-primary">Login</button>
+    </div>
+    <div id="userSignUpButton" class="col-md-4">
+        <button id="signUpButton" class="btn-primary">Signup!</button>
+    </div>
+</div>
+
+<div id="signUpDiv" class="container col-md-6">
+
+
+</div>
+</div>
+
+</div>
 </body>
 </html>

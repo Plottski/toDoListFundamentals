@@ -1,0 +1,47 @@
+#featureContainer {
+    margin-left: 100%;
+    margin-top: 20%;
+    box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.75);
+    border-radius: 25px;
+    width: 280px;
+
+
+}
+
+#containerHeader {
+    margin: auto;
+    text-align: center;
+}
+
+#userDiv {
+    margin: auto;
+    margin-top: -20%;
+}
+
+#username {
+    margin-bottom: 20px;
+}
+
+#loginForUser {
+    margin-left: 41%;
+    margin-top: 20px;
+}
+
+#jumbotron {
+    margin: auto;
+    text-align: center;
+    background-color: #a7acb1;
+    height: 150px;
+    padding-top: 40px;
+
+}
+
+#features {
+    margin: auto;
+    border-radius: 25px;
+    height: 300px;
+    box-shadow: 5px 5px 10px 2px  rgb(0 0 0 / 0.8);
+    background: #6ea8fe;
+    padding-top: 15px;
+
+}

@@ -1,0 +1,39 @@
+#loginButton {
+    margin-right: 60px;
+}
+
+#userDiv {
+    position: absolute;
+    margin-left: 44%;
+    margin-top: -10%;
+
+
+}
+
+#username {
+    margin-bottom: 20px;
+
+}
+
+#password {
+    margin-bottom: 20px
+}
+
+#featureContainer {
+    border-radius: 25px;
+    background: #73AD21;
+    padding: 20px;
+    width: 250px;
+    box-shadow:  rgb(0 0 0 / 0.8);
+    display: flex;
+    margin-left: 80%;
+    margin-top: 10%;
+}
+
+#features {
+    border-radius: 25px;
+    padding-top: 15px;
+    padding-left: 30px;
+    width: 200px;
+    height: 320px;
+}
