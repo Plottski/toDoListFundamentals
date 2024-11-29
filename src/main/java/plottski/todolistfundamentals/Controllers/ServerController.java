@@ -82,7 +82,7 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
+   /* @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
     public ResponseEntity<ArrayList<Item>> deleteUserItems(HttpSession session, @RequestBody Item item) {
         if (userDB.containsKey(session.getAttribute("password").toString())) {
             //User userDeleter = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),true);
@@ -93,6 +93,26 @@ public class ServerController {
                     userItems.remove(item);
                     itemDB.put(user.getUsername(), userItems);
                     return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
+                }
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    } */
+
+    @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
+    public ResponseEntity<ArrayList<ItemWithCreationDate>> deleteUserItems(HttpSession session, @RequestBody ItemWithCreationDate item) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (userFromDB.getUsername() != null) {
+            ArrayList<ItemWithCreationDate> allUserItems = items.findAll();
+            System.out.println(item.getTitle());
+            for (int i = 0; i < allUserItems.size(); i++) {
+                //System.out.println(allUserItems.get(i).getTitle());
+                if (allUserItems.get(i).getTitle().equals(item.getTitle())) {
+                    System.out.println(allUserItems.get(i).getTitle());
+                    items.delete(allUserItems.get(i));
+                    allUserItems.remove(i);
+                    System.out.println(allUserItems.get(i).getTitle());
+                    return new ResponseEntity<>(allUserItems, HttpStatus.OK);
                 }
             }
         }

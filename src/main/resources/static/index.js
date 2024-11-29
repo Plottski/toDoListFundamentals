@@ -230,6 +230,7 @@ function displayAllItems(data) {
     var creator = data[0].creator;
     //var creatorName = username;
     mainContainer.innerHTML = '';
+
     var firstDiv = document.createElement('div');
     firstDiv.id = 'itemDiv';
     firstDiv.setAttribute('class', 'container col-md-12');
@@ -256,6 +257,7 @@ function displayAllItems(data) {
     addButton.type = 'button';
     addButton.id = 'itemButton';
     addButton.innerHTML = 'Add';
+    addButton.setAttribute('class', 'btn btn-primary');
     addButton.addEventListener('click', addItem);
 
 
@@ -267,7 +269,7 @@ function displayAllItems(data) {
     mainContainer.appendChild(firstDiv);
 
     var logoutDiv = document.createElement('div');
-    logoutDiv.setAttribute('margin-right', '0');
+    //logoutDiv.setAttribute('margin-right', '0');
     logoutDiv.id = 'logoutDiv';
 
     var logoutButton = document.createElement('button');
@@ -280,9 +282,25 @@ function displayAllItems(data) {
         userLogout(creatorName);
     })
 
+    var deleteButtonDiv = document.createElement('div');
+    deleteButtonDiv.id = 'deleteButtonDiv';
+
+    var deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.id = 'deleteButton';
+    deleteButton.innerHTML = 'Delete';
+    deleteButton.setAttribute('class', 'btn btn-danger');
+    deleteButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        deleteItem();
+    });
+
+    deleteButtonDiv.appendChild(deleteButton);
+
     logoutDiv.appendChild(logoutButton);
 
     mainContainer.appendChild(logoutDiv);
+    mainContainer.appendChild(deleteButtonDiv);
 
     var tableDiv = document.createElement('div');
     tableDiv.id = 'tableDiv';
@@ -351,7 +369,7 @@ function displayAllItems(data) {
         var selectRadio  = document.createElement('input');
         selectRadio.setAttribute('scope', 'radio');
         selectRadio.setAttribute('type', 'radio');
-        selectRadio.setAttribute('name', 'radio');
+        selectRadio.setAttribute('name', 'radio' +i);
         selectRadio.setAttribute('id', 'radio' +i);
         selectRadio.setAttribute('class', 'form-check-input');
 
@@ -477,6 +495,65 @@ function resetHTML() {
     mainContainer.appendChild(loginButton);
     mainContainer.appendChild(signUpButton);
 
+}
+
+function deleteItem() {
+    console.log("delete item function is being fired")
+    //event.preventDefault();
+    // grab table in the DOM
+    //var table = document.querySelector('table');
+    var table = document.getElementById('tableBody');
+    console.log(table.length);
+    var tableRows = table.rows;
+    console.log(tableRows);
+    console.log(tableRows.length);
+    //Iterate over the rows in the table
+    for (var i = 0; i < tableRows.length; i++) {
+        // I was trying to go through individual columns but I think this may be redundant if I can pull the ele with the iterator.
+        //for (var j = 0; j < table[i].radio[j]; j++) {
+            var radio = document.getElementById('radio' + i);
+            console.log('radio' + i);
+            console.log(radio);
+            //console.log(radio.value);
+            console.log(radio.checked);
+            if (radio.checked === true) {
+                var theTitle = document.getElementById('title' +i).innerHTML;
+                console.log(theTitle);
+                var theDesc = document.getElementById('desc' +i).innerHTML;
+                console.log(theDesc);
+                var theUser = document.getElementById('user' +i).innerHTML;
+                console.log(theUser);
+                var theCreationTime = document.getElementById('time' +i).innerHTML;
+                var numberCreationTime = Date.now();
+                console.log(theCreationTime);
+                var theDueDate = document.getElementById('dueDate' +i).innerHTML;
+                console.log(theDueDate);
+                document.getElementById('itemTable').deleteRow(i + 1);
+
+                $.ajax({
+                    url: "/delete-item",
+                    method: "DELETE",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        username: theUser,
+                        title: theTitle,
+                        description: theDesc,
+                        creationTime: numberCreationTime,
+                        dueDate: theDueDate,
+                        success: function (data) {
+                            window.location.reload();
+                           //mainContainer.innerHTML = '';
+                            displayAllItems(data);
+                        },
+                        error: function (xhr) {
+                            console.log("Error has occured");
+                            alert("Something went wrong");
+                        }
+                    })
+                })
+
+            }
+        }
 }
 
 

@@ -13,5 +13,8 @@ public interface ItemDB extends CrudRepository<ItemWithCreationDate, Integer> {
 
     @Query(value = "SELECT * FROM items WHERE userID = ?1", nativeQuery = true)
     ItemWithCreationDate findByUserIDNative(int id);
+
+    //ItemWithCreationDate findByTitle(String title);
+
     ArrayList<ItemWithCreationDate> findAll();
 }
