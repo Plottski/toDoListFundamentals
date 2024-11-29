@@ -4,8 +4,6 @@
     box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.75);
     border-radius: 25px;
     width: 280px;
-
-
 }
 
 #containerHeader {
@@ -33,7 +31,6 @@
     background-color: #a7acb1;
     height: 150px;
     padding-top: 40px;
-
 }
 
 #features {
@@ -43,5 +40,46 @@
     box-shadow: 5px 5px 10px 2px  rgb(0 0 0 / 0.8);
     background: #6ea8fe;
     padding-top: 15px;
+}
 
+#itemDiv {
+    margin: auto;
+    padding-bottom: 50px;
+    padding-top: 50px;
+    border-radius: 25px;
+    background-color: gray;
+
+}
+
+#title {
+    margin-left:6%;
+    border-radius: 15px;
+    text-align: center;
+
+}
+
+#desc {
+    margin-left: 3%;
+    border-radius: 15px;
+    text-align: center;
+}
+
+#dueDate {
+    margin-left: 3%;
+    border-radius: 15px;
+    text-align: center;
+}
+
+#itemButton {
+    margin-left: 3%;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#tableDiv {
+    padding-top: 50px;
+}
+
+#itemTable {
+    border-radius: 25px;
 }

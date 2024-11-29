@@ -57,9 +57,19 @@ public class ServerController {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
         theItem.setUserID(userFromDB.getId());
         theItem.setUsername(userFromDB.getUsername());
+        System.out.println(theItem.getDueDate());
         Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
+        //put the unformatted due date in a string
+        String theDueDateWhole = theItem.getDueDate();
+        //split the string into an array of strings
+        String [] dateParts = theDueDateWhole.split("-");
+        //order the string to spit out "American" style date formatting
+        String formattedDueDate = dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0];
+        //set the formatted due date and save in the DB
+        System.out.println(formattedDueDate);
+        theItem.setDueDate(formattedDueDate);
         items.save(theItem);
-        if (userFromDB != null) {
+        if (userFromDB.getUsername() != null) {
             ArrayList<ItemWithCreationDate> dbItems = dbItems = items.findAll();
             for (int i = 0; i < dbItems.size(); i++) {
                 if (dbItems.get(i).getUserID() != userFromDB.getId()) {

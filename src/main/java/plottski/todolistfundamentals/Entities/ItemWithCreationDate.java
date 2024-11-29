@@ -25,16 +25,20 @@ public class ItemWithCreationDate {
     @Column(nullable = false)
     private String username;
 
+    @Column(nullable = false)
+    private String dueDate;
+
     public ItemWithCreationDate(){
 
     }
 
-    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username) {
+    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, String dueDate) {
         this.title = title;
         this.description = description;
         this.creationTime = creationTime;
         this.userID = userID;
         this.username = username;
+        this.dueDate = dueDate;
     }
 
     public int getId() {
@@ -81,4 +85,11 @@ public class ItemWithCreationDate {
         this.username = username;
     }
 
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
 }
