@@ -15,5 +15,4 @@ public class TodolistfundamentalsApplication {
 
 		SpringApplication.run(TodolistfundamentalsApplication.class, args);
 	}
-
 }

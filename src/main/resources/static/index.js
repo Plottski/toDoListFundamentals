@@ -48,7 +48,8 @@ function signUp() {
         data: JSON.stringify({"username": uName,
             "password": pw}),
         success: function (data) {
-                    toDoListDash();
+                    //toDoListDash();
+                    navBarDash();
             },
         error: function (data) {
             console.log("Error has occured");
@@ -56,6 +57,168 @@ function signUp() {
         }
     })
 }
+
+function navBarDash() {
+    console.log("navBar functioning");
+    $(document).ready(function () {
+        $.get('/get-lists', function(data) {
+            console.log(data);
+            mainContainer.innerHTML = '';
+
+            var navbar = document.createElement('nav');
+            navbar.setAttribute('id', 'navbar');
+            navbar.setAttribute('class', 'navbar navbar-expand-lg navbar-light bg-light');
+
+            var logOutLink = document.createElement('a');
+            logOutLink.setAttribute('href', '/logout');
+            logOutLink.setAttribute('class', 'navbar-brand')
+            logOutLink.innerHTML = 'Logout';
+
+            navbar.appendChild(logOutLink);
+
+            var navBarButton = document.createElement('button');
+            navBarButton.setAttribute('id', 'navBarButton');
+            navBarButton.setAttribute('class', 'navbar-toggler');
+            navBarButton.setAttribute('type', 'button');
+            navBarButton.setAttribute('data-toggle', 'collapse');
+            navBarButton.setAttribute('data-target', '#navbarSupportedContent');
+            navBarButton.setAttribute('aria-controls', 'navbarSupportedContent');
+            navBarButton.setAttribute('aria-expanded', 'false');
+            navBarButton.setAttribute('aria-label', 'Toggle navigation');
+
+            navbar.appendChild(navBarButton);
+
+            var navSpan = document.createElement('span');
+            navSpan.setAttribute('class', 'navbar-toggler-icon');
+
+            navbar.appendChild(navSpan);
+
+            var navDiv = document.createElement('div');
+            navDiv.setAttribute('class', 'collapse navbar-collapse');
+            navDiv.setAttribute('id', 'navbarSupportedContent');
+
+
+            var navList = document.createElement('ul');
+            navList.setAttribute('class', 'navbar-nav mr-auto');
+
+            var homeLI = document.createElement('li');
+            homeLI.setAttribute('class', 'nav-item-active');
+
+            var homeLink = document.createElement('a');
+            homeLink.setAttribute('class', 'nav-link');
+            homeLink.addEventListener('click', function (event) {
+                event.preventDefault();
+                navBarDash();
+            })
+            homeLink.innerHTML = 'Home';
+
+            //navDiv.appendChild(navList);
+
+            homeLI.appendChild(homeLink);
+            navList.appendChild(homeLI);
+
+            //navDiv.appendChild(homeLI);
+            //navDiv.appendChild(homeLink);
+
+
+            var liForAbout = document.createElement('li');
+            liForAbout.setAttribute('class', 'nav-item');
+
+            var linkAbout = document.createElement('a');
+            linkAbout.setAttribute('class', 'nav-link');
+            linkAbout.addEventListener('click', function (event) {})
+            linkAbout.innerHTML = 'About';
+
+            liForAbout.appendChild(linkAbout);
+
+            navList.appendChild(liForAbout);
+
+            var dropDownList = document.createElement('li');
+            dropDownList.setAttribute('class', 'nav-item dropdown');
+
+            var dropDownListLink = document.createElement('a');
+            dropDownListLink.setAttribute('class', 'nav-link dropdown-toggle');
+            dropDownListLink.setAttribute('id', 'navbarDropDown');
+            dropDownListLink.setAttribute('role', 'button');
+            dropDownListLink.setAttribute('aria-expanded', 'false');
+            dropDownListLink.setAttribute('data-toggle', 'dropdown');
+            dropDownListLink.setAttribute('aria-haspopup', 'true');
+            dropDownListLink.innerHTML = 'Your Lists';
+
+            dropDownList.appendChild(dropDownListLink);
+
+            //navList.appendChild(dropDownList);
+
+            var dropDownListDiv = document.createElement('div');
+            dropDownListDiv.setAttribute('class', 'dropdown-menu')
+            dropDownListDiv.setAttribute('aria-labelledby', 'navbarDropdown');
+
+            //dropDownListDiv.appendChild(newListLink);
+
+            for (var i = 0; i < data.length; i++) {
+                var dropDownLink = document.createElement('a');
+                dropDownLink.setAttribute('class', 'dropdown-item');
+                dropDownLink.innerHTML = data[i].listName;
+
+                dropDownListDiv.appendChild(dropDownLink);
+            }
+
+            var newListLink = document.createElement('li');
+            newListLink.setAttribute('class', 'nav-item');
+            newListLink.innerHTML = 'Create New List';
+            newListLink.addEventListener('click', function (event) {
+                event.preventDefault();
+                const userInput = prompt("Please enter a title for your list");
+                if (userInput !== null) {
+                    console.log(userInput);
+                    var listName = userInput;
+                    console.log(listName);
+                    createNewList(listName);
+                }
+            })
+
+            navList.appendChild(newListLink);
+
+            //dropDownList.appendChild(dropDownListDiv);
+
+            dropDownListLink.appendChild(dropDownListDiv);
+
+            //navList.appendChild(dropDownListDiv);
+
+            navList.appendChild(dropDownListLink);
+
+            navDiv.appendChild(navList);
+
+            navbar.appendChild(navDiv);
+
+            mainContainer.appendChild(navbar);
+
+        })
+    })
+
+}
+
+function createNewList(listName) {
+    //console.log(listTitle.value);
+    console.log(listName);
+    $.ajax({
+        url: "/create-new-list",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            'listName': listName.valueOf(),
+        }),
+        success: function (data) {
+            console.log(data);
+            navBarDash();
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr.responseText);
+        }
+    })
+}
+
+
 
 function toDoListDash() {
 
@@ -227,7 +390,7 @@ function displayAllItems(data) {
     //var tableBody = document.getElementById('tableBody');
     //tableBody.innerHTML = '';
 
-    var creator = data[0].creator;
+   // var creator = data[0].creator;
     //var creatorName = username;
     mainContainer.innerHTML = '';
 

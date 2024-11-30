@@ -1,15 +1,14 @@
 package plottski.todolistfundamentals.Controllers;
 
+import com.fasterxml.jackson.core.JsonParser;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import plottski.todolistfundamentals.Entities.Item;
-import plottski.todolistfundamentals.Entities.ItemWithCreationDate;
-import plottski.todolistfundamentals.Entities.User;
-import plottski.todolistfundamentals.Entities.UserForDB;
+import plottski.todolistfundamentals.Entities.*;
 import plottski.todolistfundamentals.Services.ItemDB;
+import plottski.todolistfundamentals.Services.UserItemListsRepo;
 import plottski.todolistfundamentals.Services.UserRepo;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -23,6 +22,9 @@ public class ServerController {
 
     @Autowired
     ItemDB items;
+
+    @Autowired
+    UserItemListsRepo userLists;
 
     private final HashMap<String, User> userDB = new HashMap<String, User>();
     private final HashMap<String, ArrayList<Item>> itemDB = new HashMap<String, ArrayList<Item>>();
@@ -51,6 +53,16 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
+    @RequestMapping(path = "add-list", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> newUserList(HttpSession session, @RequestBody UserItemList userItemList) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (userFromDB.getUsername() != null) {
+            userItemList.setUserID(userFromDB.getId());
+            userLists.save(userItemList);
+            return new ResponseEntity<>(userItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
 
     @RequestMapping(path = "/add-item", method = RequestMethod.POST)
     public ResponseEntity<ArrayList<ItemWithCreationDate>> userItems(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
@@ -148,7 +160,54 @@ public class ServerController {
         }
         return null;
     }
+
+    @RequestMapping(path = "/get-lists", method = RequestMethod.GET)
+    public ResponseEntity<ArrayList<UserItemList>> getUserLists(HttpSession session) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        //System.out.println(userFromDB.getUsername());
+        if (userFromDB.getUsername() != null && userFromDB.isLoggedIn()) {
+            ArrayList<UserItemList> theUserLists = userLists.findAll();
+            for (int i = 0; i < theUserLists.size(); i++) {
+                if (theUserLists.get(i).getUserID() != userFromDB.getId()) {
+                    theUserLists.remove(i);
+                }
+            }
+            return new ResponseEntity<>(theUserLists, HttpStatus.OK);
+
+            //UserItemList theUserItems = (UserItemList) userLists.findAll();
+            //ArrayList<> theUserLists = (ArrayList) userLists.findAll();
+            //for (int i = 0; i < theUserLists.size(); i ++) {
+
+            //}
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    //HashMap<String, String> json
+    @RequestMapping(path = "/create-new-list", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<String>> createUserList(HttpSession session, String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        System.out.println(userFromDB.getUsername());
+        //String listName = json.get("listName");
+        System.out.println(listName);
+        if (userFromDB.getUsername() != null) {
+            UserItemList userItemList = new UserItemList(listName, userFromDB.getId(), null, null);
+            userLists.save(userItemList);
+            ArrayList<String> allUserListsNames = new ArrayList<>();
+            ArrayList<UserItemList> allUsersLists = userLists.findAll();
+            for (int i = 0; i < allUsersLists.size(); i++) {
+                UserItemList eachItemList = allUsersLists.get(i);
+                if (eachItemList.getUserID() == userFromDB.getId()) {
+                    allUserListsNames.add(eachItemList.getListName());
+                }
+            }
+            return new ResponseEntity<>(allUserListsNames, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
 }
+
+
 
  /*
     @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
