@@ -35,14 +35,14 @@ public class ItemWithCreationDate {
 
     }
 
-    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, String dueDate, UserItemList listOfItems) {
+    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, String dueDate) {
         this.title = title;
         this.description = description;
         this.creationTime = creationTime;
         this.userID = userID;
         this.username = username;
         this.dueDate = dueDate;
-        this.listOfItems = listOfItems;
+        //this.listOfItems = listOfItems;
     }
 
     public int getId() {
