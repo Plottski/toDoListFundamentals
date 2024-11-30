@@ -185,7 +185,7 @@ public class ServerController {
 
     //HashMap<String, String> json
     @RequestMapping(path = "/create-new-list", method = RequestMethod.POST)
-    public ResponseEntity<ArrayList<String>> createUserList(HttpSession session, String listName) {
+    public ResponseEntity<ArrayList<String>> createUserList(HttpSession session, @RequestBody String listName) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
         System.out.println(userFromDB.getUsername());
         //String listName = json.get("listName");
@@ -202,6 +202,21 @@ public class ServerController {
                 }
             }
             return new ResponseEntity<>(allUserListsNames, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @RequestMapping(path = "/get-lists", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<UserItemList>> getUserItemLists(HttpSession session) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (userFromDB.getUsername() != null) {
+            ArrayList<UserItemList> allUserLists = userLists.findAll();
+            for (int i = 0; i < allUserLists.size(); i++) {
+                if (allUserLists.get(i).getUserID() != userFromDB.getId()) {
+                    allUserLists.remove(i);
+                }
+            }
+            return new ResponseEntity<>(allUserLists, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
