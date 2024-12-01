@@ -10,6 +10,8 @@ import plottski.todolistfundamentals.Entities.*;
 import plottski.todolistfundamentals.Services.ItemDB;
 import plottski.todolistfundamentals.Services.UserItemListsRepo;
 import plottski.todolistfundamentals.Services.UserRepo;
+import plottski.todolistfundamentals.request.ItemRequest;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,25 +67,25 @@ public class ServerController {
     }
 
     @RequestMapping(path = "/add-item", method = RequestMethod.POST)
-    public ResponseEntity<UserItemList> addItemToUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem, String listName) {
+    public ResponseEntity<UserItemList> addItemToUserItemList(HttpSession session, @RequestBody ItemRequest itemRequest) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        System.out.println(listName);
+        System.out.println(itemRequest.getListName());
         if (userFromDB.getUsername() != null) {
             ArrayList<UserItemList> allUserItemLists = userLists.findAll();
             System.out.println(allUserItemLists.get(0).getListName());
             for (int i = 0; i < allUserItemLists.size(); i++) {
                 System.out.println(i);
-                if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getListName().equals(listName)) {
+                if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getListName().equals(itemRequest.getListName())) {
                     System.out.println(allUserItemLists.get(i).getUserID());
                     UserItemList actualUserItemList = allUserItemLists.get(i);
                     System.out.println(actualUserItemList.getListName());
-                    ItemWithCreationDate itemForDB = new ItemWithCreationDate(theItem.getTitle(), theItem.getDescription(),
-                            theItem.getCreationTime(), userFromDB.getId(), userFromDB.getUsername(), theItem.getDueDate());
-                    actualUserItemList.getUserItems().add(theItem);
+                    ItemWithCreationDate itemForDB = new ItemWithCreationDate(itemRequest.getTitle(), itemRequest.getDescription(),
+                            itemRequest.getCreationTime(), userFromDB.getId(), userFromDB.getUsername(), itemRequest.getDueDate());
+                    actualUserItemList.getUserItems().add(itemRequest);
                     //System.out.println(actualUserItemList.getUserItems().get(0).getTitle());
                     System.out.println(actualUserItemList.getUserItems().get(0).getTitle());
                     //List userItemsInList = actualUserItemList.getUserItems();
-                    //userItemsInList.add(theItem);
+                    //userItemsInList.add(itemRequest);
                     //actualUserItemList.setUserItems(userItemsInList);
                     userLists.save(actualUserItemList);
                     return new ResponseEntity<>(actualUserItemList, HttpStatus.OK);
