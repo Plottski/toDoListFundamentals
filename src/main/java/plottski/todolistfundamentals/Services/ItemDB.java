@@ -23,5 +23,5 @@ public interface ItemDB extends CrudRepository<ItemWithCreationDate, Integer> {
 
     ArrayList<ItemWithCreationDate> findAll();
 
-    List findAllByListID(int listID);
+    ArrayList<ItemWithCreationDate> findAllByListID(int listID);
 }

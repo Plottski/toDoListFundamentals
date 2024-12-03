@@ -175,8 +175,19 @@ public class ServerController {
             ArrayList<UserItemList> allUserItemLists = userLists.findAll();
             for (int i = 0; i < allUserItemLists.size(); i++) {
                 if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getListName().equals(listName)) {
-
                     UserItemList theUserItemList = allUserItemLists.get(i);
+                    //theUserItemList.getUserItems().add(items.findAllByListID(theUserItemList.getId()));
+                    // itemsForList = items.findAllByListID(theUserItemList.getId());
+                    //for (int i = 0; i < itemsForList.size(); i ++) {
+                        //ItemWithCreationDate itemForList = new ItemWithCreationDate()
+                        //theUserItemList.getUserItems().add(itemsForList.get(i));
+                    //theUserItemList.getUserItems().add(items.findAllByListID(theUserItemList.getId()))
+                    ArrayList<ItemWithCreationDate> allUserListItems = items.findAllByListID(theUserItemList.getId());
+                    theUserItemList.setUserItems(allUserListItems);
+                    //for (int y = 0; y < allUserListItems.size(); y++) {
+                    //    theUserItemList.getUserItems().add(allUserListItems.get(y));
+                    //}
+                    //}
                     return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
                 }
             }

@@ -29,10 +29,12 @@ function login() {
             //lookForItems(data);
             // toDoListDash();
             //createNavBar();
+            splashPage(data);
         },
         error: function (xhr) {
             console.log("Error has occured");
             alert("Username or password incorrect");
+
         }
     })
 }
@@ -192,6 +194,8 @@ function displayItemsPage(data) {
 
     userItems = data.userItems;
 
+    console.log(userItems);
+
     var firstDiv = document.createElement('div');
     firstDiv.id = 'itemDiv';
     firstDiv.setAttribute('class', 'container col-md-12');
@@ -308,11 +312,11 @@ function displayItemsPage(data) {
 
     //var itemTable = document.getElementById('itemTable');
 
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < userItems.length; i++) {
         var row = document.createElement('tr');
         row.setAttribute('scope', 'row');
 
-        var theCreator = data[i].creator;
+        var theCreator = userItems[i].username;
 
         var selectCol = document.createElement('td');
         selectCol.setAttribute('scope', 'col');
@@ -339,40 +343,43 @@ function displayItemsPage(data) {
 
         //selectCol.appendChild(selectLabel);
 
-        var date = new Date(data[i].creationTime);
+        //var date = new Date(data[i].creationTime);
 
-        var dueDate = new Date(data[i].dueDate);
+        //var dueDate = new Date(data[i].dueDate);
 
         console.log(dueDate);
+
+        var theCreationDate = new Date(userItems[i].creationTime);
 
         var titleCol = document.createElement('td');
         titleCol.setAttribute('scope', 'col');
         titleCol.setAttribute('id', 'title' + i);
-        titleCol.innerHTML = data[i].title;
+        titleCol.innerHTML = userItems[i].title;
         var descCol = document.createElement('td');
         descCol.setAttribute('scope', 'col');
         descCol.setAttribute('id', 'desc' + i);
-        descCol.innerHTML = data[i].description;
+        descCol.innerHTML = userItems[i].description;
         var userCol = document.createElement('td');
         userCol.setAttribute('scope', 'col');
         userCol.setAttribute('id', 'user' + i);
         //userCol.innerHTML = theCreator.username;
-        userCol.innerHTML = data[i].username;
+        userCol.innerHTML = userItems[i].username;
         var timeCol = document.createElement('td');
         timeCol.setAttribute('scope', 'col');
         timeCol.setAttribute('id', 'time' + i);
-        timeCol.innerHTML = date.toLocaleDateString('en-US');
+        timeCol.innerHTML = theCreationDate.toLocaleDateString('en-US');
+        //timeCol.innerHTML = userItems[i].toLocaleDateString('en-US');
         //timeCol.innerHTML = date;
         //timeCol.innerHtml = Date(data[i].creationTime);
 
         var dueDateCol = document.createElement('td');
         dueDateCol.setAttribute('scope', 'col');
         dueDateCol.setAttribute('id', 'dueDate' + i);
-        dueDateCol.innerHTML = data[i].dueDate;
+        dueDateCol.innerHTML = userItems[i].dueDate;
 
         console.log(dueDateCol);
 
-        console.log(data[i].creationTime);
+        //console.log(data[i].creationTime);
 
         row.appendChild(selectCol);
         row.appendChild(titleCol);
@@ -410,13 +417,16 @@ function addItem() {
             console.log(data);
             var theItemTable = document.getElementById("tableBody")
             theItemTable.innerHTML = '';
-            //document.getElementById("title").innerHTML ="";
-            //document.getElementById("desc").innerHTML ="";
-            //document.getElementById("dueDate").innerHTML ="";
 
-            title.innerHTML ="";
-            description.innerHTML ="";
-            dueDate.innerHTML ="";
+            var title = document.getElementById('title');
+            title.innerHTML = 'Title of item';
+            console.log(title);
+
+            var descrip = document.getElementById('desc');
+            descrip.innerHTML = 'Description of item';
+
+            var dueDate = document.getElementById('dueDate');
+            dueDate.innerHTML = 'Due date';
 
             var theData = [];
             theData = data.userItems;
