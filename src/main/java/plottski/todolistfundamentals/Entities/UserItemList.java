@@ -15,6 +15,8 @@ public class UserItemList {
     @Column
     private String listName;
 
+    private String username;
+
     @Column
     private int userID;
 
@@ -28,8 +30,9 @@ public class UserItemList {
 
     }
 
-    public UserItemList(String listName, int userID, List<ItemWithCreationDate> userItems, List<UserForDB> collaborators) {
+    public UserItemList(String listName, String username, int userID, List<ItemWithCreationDate> userItems, List<UserForDB> collaborators) {
         this.listName = listName;
+        this.username = username;
         this.userID = userID;
         this.userItems = userItems;
         this.collaborators = collaborators;
@@ -45,6 +48,14 @@ public class UserItemList {
 
     public void setListName(String listName) {
         this.listName = listName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public int getUserID() {

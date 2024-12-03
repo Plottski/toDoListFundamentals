@@ -25,6 +25,9 @@ public class ItemWithCreationDate {
     private int userID;
 
     @Column(nullable = false)
+    private String username;
+
+    @Column(nullable = false)
     private int listID;
 
     @Column(nullable = false)
@@ -40,11 +43,12 @@ public class ItemWithCreationDate {
 
     }
 
-    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, int listID, String listName, String dueDate, UserItemList listOfItems) {
+    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, int listID, String listName, String dueDate, UserItemList listOfItems) {
         this.title = title;
         this.description = description;
         this.creationTime = creationTime;
         this.userID = userID;
+        this.username = username;
         this.listID = listID;
         this.listName = listName;
         this.dueDate = dueDate;
@@ -85,6 +89,14 @@ public class ItemWithCreationDate {
 
     public void setUserID(int userID) {
         this.userID = userID;
+    }
+
+    public String getUsername() {
+        return username = username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public int getListID() {

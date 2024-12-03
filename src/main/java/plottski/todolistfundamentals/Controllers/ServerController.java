@@ -9,6 +9,8 @@ import plottski.todolistfundamentals.Entities.*;
 import plottski.todolistfundamentals.Services.ItemDB;
 import plottski.todolistfundamentals.Services.UserItemListsRepo;
 import plottski.todolistfundamentals.Services.UserRepo;
+
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,12 +67,27 @@ public class ServerController {
     @RequestMapping(path = "/add-item", method = RequestMethod.POST)
     public ResponseEntity<UserItemList> addItemtoUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        System.out.println(theItem.getCreationTime());
+        Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
+        //put the unformatted due date in a string
+        String theDueDateWhole = theItem.getDueDate();
+        //split the string into an array of strings
+        String[] dateParts = theDueDateWhole.split("-");
+        //order the string to spit out "American" style date formatting
+        String formattedDueDate = dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0];
+        //set the formatted due date and save in the DB
+        System.out.println(formattedDueDate);
+        theItem.setDueDate(formattedDueDate);
+        theItem.setUsername(userFromDB.getUsername());
+        System.out.println(theItem.getUsername());
         if (userFromDB.getUsername() != null) {
             ArrayList<UserItemList> allUserItemLists = userLists.findUserListsByid(userFromDB.getId());
             theItem.setUserID(userFromDB.getId());
+            theItem.setUsername(userFromDB.getUsername());
             for (int i = 0; i < allUserItemLists.size(); i++) {
                 if (allUserItemLists.get(i).getListName().equals(theItem.getListName())) {
                     UserItemList theUserItemList = allUserItemLists.get(i);
+                    theUserItemList.setUsername(userFromDB.getUsername());
                     List<ItemWithCreationDate> itemsList = theUserItemList.getUserItems();
                     userLists.save(theUserItemList);
                     UserItemList userItemListForItemListID = userLists.findByListName(theItem.getListName());
@@ -172,7 +189,7 @@ public class ServerController {
     public ResponseEntity<ArrayList<String>> createUserList(HttpSession session, @RequestBody String listName) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
         if (userFromDB.getUsername() != null) {
-            UserItemList userItemList = new UserItemList(listName, userFromDB.getId(), null, null);
+            UserItemList userItemList = new UserItemList(listName, userFromDB.getUsername(), userFromDB.getId(), null, null);
             userLists.save(userItemList);
             ArrayList<String> allUserListsNames = new ArrayList<>();
             ArrayList<UserItemList> allUsersLists = userLists.findAll();

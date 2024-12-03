@@ -394,7 +394,6 @@ function addItem() {
     var dueDate = document.getElementById('dueDate').value;
     var listNameElement = document.getElementById('pageHeader');
     var listName = listNameElement.innerText;
-    //console.log(creationDate);
     console.log(listName);
     $.ajax({
         url: "/add-item",
@@ -409,10 +408,91 @@ function addItem() {
         }),
         success: function (data) {
             console.log(data);
-            //console.log(data.title);
-            //displayItems(data);
-            //lookForItems(data)
-            //displayAllItems(data);
+            var theItemTable = document.getElementById("tableBody")
+            theItemTable.innerHTML = '';
+            //document.getElementById("title").innerHTML ="";
+            //document.getElementById("desc").innerHTML ="";
+            //document.getElementById("dueDate").innerHTML ="";
+
+            title.innerHTML ="";
+            description.innerHTML ="";
+            dueDate.innerHTML ="";
+
+            var theData = [];
+            theData = data.userItems;
+
+            console.log(theData);
+
+            var wholeItemTable = document.getElementById("itemTable");
+
+            for (var i = 0; i <theData.length; i++) {
+
+                var theCreationDate = new Date(theData[i].creationTime);
+                console.log(theCreationDate);
+
+               // var theDueDate = theData[i].dueDate;
+
+                //var theDueDate = new Date(data[i].userItems[i].dueDate);
+                //var theDueDate = new Date(theData[i].dueDate);
+
+                var newRow = document.createElement("tr");
+                newRow.setAttribute('scope', 'row');
+                newRow.setAttribute('id', 'newTableRow-' + i);
+
+                var selectCol = document.createElement('td');
+                selectCol.setAttribute('scope', 'col');
+
+                var selectRadio = document.createElement('input');
+                selectRadio.setAttribute('scope', 'radio');
+                selectRadio.setAttribute('type', 'radio');
+                selectRadio.setAttribute('id', 'selectCol-' + i);
+                selectRadio.setAttribute('class', 'form-check-input');
+
+                selectCol.appendChild(selectRadio);
+
+                var titleCol = document.createElement('td');
+                titleCol.setAttribute('scope', 'col');
+                titleCol.setAttribute('id', 'title-' + i);
+                //titleCol.innerHTML = data[i].userItems[i].title;
+                titleCol.innerHTML = theData[i].title;
+
+                var descCol = document.createElement('td');
+                descCol.setAttribute('scope', 'col');
+                descCol.setAttribute('id', 'desc-' + i);
+                //descCol.innerHTML = data[i].userItems[i].description;
+                descCol.innerHTML = theData[i].description;
+
+                var userCol = document.createElement('td');
+                userCol.setAttribute('scope', 'col');
+                userCol.setAttribute('id', 'user-' + i);
+                //userCol.innerHTML = data[i].userItems[i].username;
+                userCol.innerHTML = theData[i].username;
+
+                var timeCol = document.createElement('td');
+                timeCol.setAttribute('scope', 'col');
+                timeCol.setAttribute('id', 'time-' + i);
+                timeCol.innerHTML = theCreationDate.toLocaleDateString('en-US');
+
+                var dueDateCol = document.createElement('td');
+                dueDateCol.setAttribute('scope', 'col');
+                dueDateCol.setAttribute('id', 'dueDate-' + i);
+                //dueDateCol.innerHTML = data[i].dueDate;
+                dueDateCol.innerHTML = theData[i].dueDate;
+
+                //console.log(data[i].userItems[i].username);
+                console.log(theData.username);
+
+                newRow.appendChild(selectCol);
+                newRow.appendChild(titleCol);
+                newRow.appendChild(descCol);
+                newRow.appendChild(userCol);
+                newRow.appendChild(timeCol);
+                newRow.appendChild(dueDateCol);
+
+                theItemTable.appendChild(newRow);
+
+            }
+            wholeItemTable.appendChild(theItemTable);
         },
         error: function (xhr) {
             console.log("Error has occured");
