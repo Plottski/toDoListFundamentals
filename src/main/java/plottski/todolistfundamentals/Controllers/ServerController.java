@@ -1,6 +1,5 @@
 package plottski.todolistfundamentals.Controllers;
 
-import com.fasterxml.jackson.core.JsonParser;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +9,6 @@ import plottski.todolistfundamentals.Entities.*;
 import plottski.todolistfundamentals.Services.ItemDB;
 import plottski.todolistfundamentals.Services.UserItemListsRepo;
 import plottski.todolistfundamentals.Services.UserRepo;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,28 +63,22 @@ public class ServerController {
     }
 
     @RequestMapping(path = "/add-item", method = RequestMethod.POST)
-    public ResponseEntity<UserItemList> addItemToUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem, String listName) {
+    public ResponseEntity<UserItemList> addItemtoUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        System.out.println(listName);
         if (userFromDB.getUsername() != null) {
-            ArrayList<UserItemList> allUserItemLists = userLists.findAll();
-            System.out.println(allUserItemLists.get(0).getListName());
+            ArrayList<UserItemList> allUserItemLists = userLists.findUserListsByid(userFromDB.getId());
+            theItem.setUserID(userFromDB.getId());
             for (int i = 0; i < allUserItemLists.size(); i++) {
-                System.out.println(i);
-                if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getListName().equals(listName)) {
-                    System.out.println(allUserItemLists.get(i).getUserID());
-                    UserItemList actualUserItemList = allUserItemLists.get(i);
-                    System.out.println(actualUserItemList.getListName());
-                    ItemWithCreationDate itemForDB = new ItemWithCreationDate(theItem.getTitle(), theItem.getDescription(),
-                            theItem.getCreationTime(), userFromDB.getId(), userFromDB.getUsername(), theItem.getDueDate());
-                    actualUserItemList.getUserItems().add(theItem);
-                    //System.out.println(actualUserItemList.getUserItems().get(0).getTitle());
-                    System.out.println(actualUserItemList.getUserItems().get(0).getTitle());
-                    //List userItemsInList = actualUserItemList.getUserItems();
-                    //userItemsInList.add(theItem);
-                    //actualUserItemList.setUserItems(userItemsInList);
-                    userLists.save(actualUserItemList);
-                    return new ResponseEntity<>(actualUserItemList, HttpStatus.OK);
+                if (allUserItemLists.get(i).getListName().equals(theItem.getListName())) {
+                    UserItemList theUserItemList = allUserItemLists.get(i);
+                    List<ItemWithCreationDate> itemsList = theUserItemList.getUserItems();
+                    userLists.save(theUserItemList);
+                    UserItemList userItemListForItemListID = userLists.findByListName(theItem.getListName());
+                    theItem.setListID(userItemListForItemListID.getId());
+                    items.save(theItem);
+                    theUserItemList.setUserItems(items.findAllByListID(theItem.getListID()));
+                    System.out.println(theUserItemList.getUserItems());
+                    return new ResponseEntity<UserItemList>(theUserItemList, HttpStatus.OK);
                 }
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -94,57 +86,7 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-   /* @RequestMapping(path = "/add-list", method = RequestMethod.POST)
-    public ResponseEntity<UserItemList> newUserList(HttpSession session, @RequestBody String listName) {
 
-    } */
-
-    /*@RequestMapping(path = "/add-item", method = RequestMethod.POST)
-    public ResponseEntity<ArrayList<ItemWithCreationDate>> userItems(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
-        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        theItem.setUserID(userFromDB.getId());
-        theItem.setUsername(userFromDB.getUsername());
-        System.out.println(theItem.getDueDate());
-        Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
-        //put the unformatted due date in a string
-        String theDueDateWhole = theItem.getDueDate();
-        //split the string into an array of strings
-        String[] dateParts = theDueDateWhole.split("-");
-        //order the string to spit out "American" style date formatting
-        String formattedDueDate = dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0];
-        //set the formatted due date and save in the DB
-        System.out.println(formattedDueDate);
-        theItem.setDueDate(formattedDueDate);
-        items.save(theItem);
-        if (userFromDB.getUsername() != null) {
-            ArrayList<ItemWithCreationDate> dbItems = dbItems = items.findAll();
-            for (int i = 0; i < dbItems.size(); i++) {
-                if (dbItems.get(i).getUserID() != userFromDB.getId()) {
-                    System.out.println(dbItems.get(i));
-                    dbItems.remove(i);
-                }
-            }
-            return new ResponseEntity<ArrayList<ItemWithCreationDate>>(dbItems, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }*/
-
-   /* @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
-    public ResponseEntity<ArrayList<Item>> deleteUserItems(HttpSession session, @RequestBody Item item) {
-        if (userDB.containsKey(session.getAttribute("password").toString())) {
-            //User userDeleter = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),true);
-            User user = userDB.get(session.getAttribute("password").toString());
-            ArrayList<Item> userItems = itemDB.get(user.getUsername());
-            for (int i = 0; i < userItems.size(); i++) {
-                if (userItems.contains(item.getTitle())) {
-                    userItems.remove(item);
-                    itemDB.put(user.getUsername(), userItems);
-                    return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
-                }
-            }
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    } */
 
     @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
     public ResponseEntity<ArrayList<ItemWithCreationDate>> deleteUserItems(HttpSession session, @RequestBody ItemWithCreationDate item) {
@@ -153,7 +95,6 @@ public class ServerController {
             ArrayList<ItemWithCreationDate> allUserItems = items.findAll();
             System.out.println(item.getTitle());
             for (int i = 0; i < allUserItems.size(); i++) {
-                //System.out.println(allUserItems.get(i).getTitle());
                 if (allUserItems.get(i).getTitle().equals(item.getTitle())) {
                     System.out.println(allUserItems.get(i).getTitle());
                     items.delete(allUserItems.get(i));
@@ -189,7 +130,6 @@ public class ServerController {
             userFromDB.setLoggedIn(false);
             userDB.replace(userFromDB.getPassword(), userFromDB);
             User emptyUser = new User(null, null, false);
-            //return new ResponseEntity<User>(emptyUser, HttpStatus.OK);\
             System.out.println("you are hitting the endpoint successfully");
             return null;
         }
@@ -199,7 +139,6 @@ public class ServerController {
     @RequestMapping(path = "/get-lists", method = RequestMethod.GET)
     public ResponseEntity<ArrayList<UserItemList>> getUserLists(HttpSession session) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        //System.out.println(userFromDB.getUsername());
         if (userFromDB.getUsername() != null && userFromDB.isLoggedIn()) {
             ArrayList<UserItemList> theUserLists = userLists.findAll();
             for (int i = 0; i < theUserLists.size(); i++) {
@@ -208,12 +147,6 @@ public class ServerController {
                 }
             }
             return new ResponseEntity<>(theUserLists, HttpStatus.OK);
-
-            //UserItemList theUserItems = (UserItemList) userLists.findAll();
-            //ArrayList<> theUserLists = (ArrayList) userLists.findAll();
-            //for (int i = 0; i < theUserLists.size(); i ++) {
-
-            //}
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
@@ -225,11 +158,8 @@ public class ServerController {
             ArrayList<UserItemList> allUserItemLists = userLists.findAll();
             for (int i = 0; i < allUserItemLists.size(); i++) {
                 if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getListName().equals(listName)) {
-                    //allUserItemLists.remove(i);
+
                     UserItemList theUserItemList = allUserItemLists.get(i);
-                    //System.out.println(theUserItemList.getListName());
-                    //System.out.println(allUserItemLists.get(i).getListName());
-                    //System.out.println(allUserItemLists.get(i).getUserID());
                     return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
                 }
             }
@@ -238,13 +168,9 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    //HashMap<String, String> json
     @RequestMapping(path = "/create-new-list", method = RequestMethod.POST)
     public ResponseEntity<ArrayList<String>> createUserList(HttpSession session, @RequestBody String listName) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        //System.out.println(userFromDB.getUsername());
-        //String listName = json.get("listName");
-        //System.out.println(listName);
         if (userFromDB.getUsername() != null) {
             UserItemList userItemList = new UserItemList(listName, userFromDB.getId(), null, null);
             userLists.save(userItemList);
@@ -371,3 +297,99 @@ public class ServerController {
         return new ResponseEntity<ArrayList<Item>>(HttpStatus.FORBIDDEN);
     } */
 
+/*@RequestMapping(path = "/add-item", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> addItemToUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        //System.out.println(listName);
+        if (userFromDB.getUsername() != null) {
+            ArrayList<UserItemList> allUserItemLists = userLists.findUserListsByID(userFromDB.getId());
+            System.out.println(allUserItemLists.get(0).getListName());
+            for (int i = 0; i < allUserItemLists.size(); i++) {
+                System.out.println(i);
+                /*if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getUserID()) {
+                    System.out.println(allUserItemLists.get(i).getUserID());
+                    UserItemList actualUserItemList = allUserItemLists.get(i);
+                    System.out.println(actualUserItemList.getListName());
+                    //ItemWithCreationDate itemForDB = new ItemWithCreationDate(theItem.getTitle(), theItem.getDescription(),
+                    //        theItem.getCreationTime(), userFromDB.getId(), userFromDB.getUsername(), theItem.getDueDate());
+                    actualUserItemList.getUserItems().add(theItem);
+                    //System.out.println(actualUserItemList.getUserItems().get(0).getTitle());
+                    System.out.println(actualUserItemList.getUserItems().get(0).getTitle());
+                    //List userItemsInList = actualUserItemList.getUserItems();
+                    //userItemsInList.add(theItem);
+                    //actualUserItemList.setUserItems(userItemsInList);
+                    userLists.save(actualUserItemList);
+                    return new ResponseEntity<>(actualUserItemList, HttpStatus.OK); */
+// }
+// }
+//return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+   /* @RequestMapping(path = "/add-list", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> newUserList(HttpSession session, @RequestBody String listName) {
+
+    } */
+
+    /*@RequestMapping(path = "/add-item", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<ItemWithCreationDate>> userItems(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        theItem.setUserID(userFromDB.getId());
+        theItem.setUsername(userFromDB.getUsername());
+        System.out.println(theItem.getDueDate());
+        Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
+        //put the unformatted due date in a string
+        String theDueDateWhole = theItem.getDueDate();
+        //split the string into an array of strings
+        String[] dateParts = theDueDateWhole.split("-");
+        //order the string to spit out "American" style date formatting
+        String formattedDueDate = dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0];
+        //set the formatted due date and save in the DB
+        System.out.println(formattedDueDate);
+        theItem.setDueDate(formattedDueDate);
+        items.save(theItem);
+        if (userFromDB.getUsername() != null) {
+            ArrayList<ItemWithCreationDate> dbItems = dbItems = items.findAll();
+            for (int i = 0; i < dbItems.size(); i++) {
+                if (dbItems.get(i).getUserID() != userFromDB.getId()) {
+                    System.out.println(dbItems.get(i));
+                    dbItems.remove(i);
+                }
+            }
+            return new ResponseEntity<ArrayList<ItemWithCreationDate>>(dbItems, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }*/
+
+   /* @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
+    public ResponseEntity<ArrayList<Item>> deleteUserItems(HttpSession session, @RequestBody Item item) {
+        if (userDB.containsKey(session.getAttribute("password").toString())) {
+            //User userDeleter = new User(session.getAttribute("username").toString(), session.getAttribute("password").toString(),true);
+            User user = userDB.get(session.getAttribute("password").toString());
+            ArrayList<Item> userItems = itemDB.get(user.getUsername());
+            for (int i = 0; i < userItems.size(); i++) {
+                if (userItems.contains(item.getTitle())) {
+                    userItems.remove(item);
+                    itemDB.put(user.getUsername(), userItems);
+                    return new ResponseEntity<ArrayList<Item>>(userItems, HttpStatus.OK);
+                }
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    } */
+
+//System.out.println(userFromDB.getUsername());
+//String listName = json.get("listName");
+//System.out.println(listName);
+//allUserItemLists.remove(i);
+//System.out.println(allUserItems.get(i).getTitle());
+//return new ResponseEntity<User>(emptyUser, HttpStatus.OK);\
+//System.out.println(theUserItemList.getListName());
+//System.out.println(allUserItemLists.get(i).getListName());
+//System.out.println(allUserItemLists.get(i).getUserID());
+//UserItemList theUserItems = (UserItemList) userLists.findAll();
+//ArrayList<> theUserLists = (ArrayList) userLists.findAll();
+//for (int i = 0; i < theUserLists.size(); i ++) {
+
+//}
+//HashMap<String, String> json
+//System.out.println(userFromDB.getUsername());

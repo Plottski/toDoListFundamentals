@@ -2,6 +2,8 @@ package plottski.todolistfundamentals.Entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 
 @Entity
 public class ItemWithCreationDate {
@@ -23,7 +25,10 @@ public class ItemWithCreationDate {
     private int userID;
 
     @Column(nullable = false)
-    private String username;
+    private int listID;
+
+    @Column(nullable = false)
+    private String listName;
 
     @Column(nullable = false)
     private String dueDate;
@@ -35,14 +40,15 @@ public class ItemWithCreationDate {
 
     }
 
-    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, String dueDate) {
+    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, int listID, String listName, String dueDate, UserItemList listOfItems) {
         this.title = title;
         this.description = description;
         this.creationTime = creationTime;
         this.userID = userID;
-        this.username = username;
+        this.listID = listID;
+        this.listName = listName;
         this.dueDate = dueDate;
-        //this.listOfItems = listOfItems;
+        this.listOfItems = listOfItems;
     }
 
     public int getId() {
@@ -81,12 +87,20 @@ public class ItemWithCreationDate {
         this.userID = userID;
     }
 
-    public String getUsername() {
-        return username;
+    public int getListID() {
+        return listID;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setListID(int listID) {
+        this.listID = listID;
+    }
+
+    public String getListName() {
+        return listName;
+    }
+
+    public void setListName(String listName) {
+        this.listName = listName;
     }
 
     public String getDueDate() {
@@ -106,20 +120,15 @@ public class ItemWithCreationDate {
     }
 
     /*
-
-    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username,
-                                String dueDate, UserItemList userItemList) {
+    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, int listID, String username, String listName, String dueDate) {
         this.title = title;
         this.description = description;
         this.creationTime = creationTime;
         this.userID = userID;
+        this.listID = listID;
         this.username = username;
+        this.listName = listName;
         this.dueDate = dueDate;
-        this.userItemList = userItemList;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getTitle() {
@@ -154,75 +163,12 @@ public class ItemWithCreationDate {
         this.userID = userID;
     }
 
-    public String getUsername() {
-        return username;
+    public int getListID() {
+        return listID;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public UserItemList getUserItemList() {
-        return userItemList;
-    }
-
-    public void setUserItemList(UserItemList userItemList) {
-        this.userItemList = userItemList;
-    } */
-
-    /*
-
-    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, String dueDate) {
-        this.title = title;
-        this.description = description;
-        this.creationTime = creationTime;
-        this.userID = userID;
-        this.username = username;
-        this.dueDate = dueDate;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(Long creationTime) {
-        this.creationTime = creationTime;
-    }
-
-    public int getUserID() {
-        return userID;
-    }
-
-    public void setUserID(int userID) {
-        this.userID = userID;
+    public void setListID(int listID) {
+        this.listID = listID;
     }
 
     public String getUsername() {
@@ -233,11 +179,27 @@ public class ItemWithCreationDate {
         this.username = username;
     }
 
+    public String getListName() {
+        return listName;
+    }
+
+    public void setListName(String listName) {
+        this.listName = listName;
+    }
+
     public String getDueDate() {
         return dueDate;
     }
 
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public UserItemList getListOfItems() {
+        return listOfItems;
+    }
+
+    public void setListOfItems(UserItemList listOfItems) {
+        this.listOfItems = listOfItems;
     } */
 }

@@ -2,8 +2,10 @@ package plottski.todolistfundamentals.Services;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import plottski.todolistfundamentals.Entities.ItemWithCreationDate;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public interface ItemDB extends CrudRepository<ItemWithCreationDate, Integer> {
@@ -16,5 +18,10 @@ public interface ItemDB extends CrudRepository<ItemWithCreationDate, Integer> {
 
     //ItemWithCreationDate findByTitle(String title);
 
+    @Query(value = "SELECT * FROM items WHERE listID = ?1", nativeQuery = true)
+    List<ItemWithCreationDate> findByListID(@Param("listID") int listID);
+
     ArrayList<ItemWithCreationDate> findAll();
+
+    List findAllByListID(int listID);
 }
