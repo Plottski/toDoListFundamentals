@@ -46,6 +46,8 @@ public class ServerController {
     public ResponseEntity<UserForDB> userLogin(HttpSession session, @RequestBody UserForDB user) {
         if (users.findByUsername(user.getUsername()) != null) {
             UserForDB userFromDB = users.findByUsername(user.getUsername());
+            session.setAttribute("username", userFromDB.getUsername());
+            System.out.println(userFromDB.getUsername());
             userFromDB.setLoggedIn(true);
             session.setAttribute("username", userFromDB.getUsername());
             return new ResponseEntity<UserForDB>(userFromDB, HttpStatus.OK);
@@ -58,6 +60,7 @@ public class ServerController {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
         if (userFromDB.getUsername() != null) {
             userItemList.setUserID(userFromDB.getId());
+            System.out.println(userItemList.getUsername());
             userLists.save(userItemList);
             return new ResponseEntity<>(userItemList, HttpStatus.OK);
         }
@@ -67,6 +70,7 @@ public class ServerController {
     @RequestMapping(path = "/add-item", method = RequestMethod.POST)
     public ResponseEntity<UserItemList> addItemtoUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        System.out.println(userFromDB.getUsername());
         System.out.println(theItem.getCreationTime());
         Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
         //put the unformatted due date in a string
@@ -81,7 +85,9 @@ public class ServerController {
         theItem.setUsername(userFromDB.getUsername());
         System.out.println(theItem.getUsername());
         if (userFromDB.getUsername() != null) {
-            ArrayList<UserItemList> allUserItemLists = userLists.findUserListsByid(userFromDB.getId());
+            //ArrayList<UserItemList> allUserItemLists = userLists.findUserListsByid(userFromDB.getId());
+            //ArrayList<UserItemList> allUserItemLists = userLists.findAllListsByid(userFromDB.getId());
+            ArrayList<UserItemList> allUserItemLists = userLists.findAll();
             theItem.setUserID(userFromDB.getId());
             theItem.setUsername(userFromDB.getUsername());
             for (int i = 0; i < allUserItemLists.size(); i++) {

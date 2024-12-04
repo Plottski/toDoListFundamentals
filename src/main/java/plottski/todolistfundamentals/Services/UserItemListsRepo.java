@@ -16,6 +16,8 @@ public interface UserItemListsRepo  extends CrudRepository<UserItemList, Integer
 
     ArrayList<UserItemList> findUserListsByid (int listID);
 
+    ArrayList<UserItemList> findAllListsByid (int userID);
+
     UserItemList findByListName (String listName);
 
 }
