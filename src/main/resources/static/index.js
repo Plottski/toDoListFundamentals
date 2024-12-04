@@ -225,21 +225,39 @@ function displayItemsPage(data) {
     addButton.setAttribute('class', 'btn btn-primary');
     addButton.addEventListener('click', addItem);
 
-    var pageHeader = document.createElement('header');
+    var pageHeader = document.createElement('p');
+    pageHeader.setAttribute('class', 'h1');
     pageHeader.id = 'pageHeader';
     pageHeader.innerHTML = data.listName;
+
+    var homeButton = document.createElement('button');
+    homeButton.setAttribute('id', 'homeButton');
+    homeButton.setAttribute('type', 'button');
+    homeButton.innerHTML = 'Home';
+    homeButton.setAttribute('class', 'btn btn-secondary');
+    homeButton.addEventListener('click', splashPage);
 
 
     firstDiv.appendChild(titleInput);
     firstDiv.appendChild(descInput);
     firstDiv.appendChild(dueDateInput);
     firstDiv.appendChild(addButton);
-    firstDiv.appendChild(pageHeader);
+    //firstDiv.appendChild(homeButton);
+    //firstDiv.appendChild(pageHeader);
+
+    var secondDiv = document.createElement('div');
+    secondDiv.id = 'secondDiv';
+    secondDiv.setAttribute('class', 'container col-md-12');
+
+    secondDiv.appendChild(homeButton);
+    secondDiv.appendChild(pageHeader);
 
     mainContainer.appendChild(firstDiv);
 
-    var deleteButtonDiv = document.createElement('div');
-    deleteButtonDiv.id = 'deleteButtonDiv';
+    mainContainer.appendChild(secondDiv);
+
+    //var deleteButtonDiv = document.createElement('div');
+    //deleteButtonDiv.id = 'deleteButtonDiv';
 
     var deleteButton = document.createElement('button');
     deleteButton.type = 'button';
@@ -251,12 +269,12 @@ function displayItemsPage(data) {
         deleteItem();
     });
 
-    deleteButtonDiv.appendChild(deleteButton);
+    //deleteButtonDiv.appendChild(deleteButton);
 
     //logoutDiv.appendChild(logoutButton);
 
     //mainContainer.appendChild(logoutDiv);
-    mainContainer.appendChild(deleteButtonDiv);
+    //mainContainer.appendChild(deleteButtonDiv);
 
     var tableDiv = document.createElement('div');
     tableDiv.id = 'tableDiv';
@@ -294,12 +312,21 @@ function displayItemsPage(data) {
     dueDateHeader.setAttribute('scope', 'col');
     dueDateHeader.innerHTML = 'Due Date';
 
+    var deleteHeader = document.createElement('th');
+    deleteHeader.setAttribute('scope', 'col');
+    deleteHeader.setAttribute('id', 'deleteHeader');
+
+    deleteHeader.appendChild(deleteButton);
+
     headerRow.appendChild(selectHeader);
     headerRow.appendChild(titleHeader);
     headerRow.appendChild(descHeader);
     headerRow.appendChild(userHeader);
     headerRow.appendChild(timeHeader);
     headerRow.appendChild(dueDateHeader);
+    //headerRow.appendChild(deleteHeader);
+
+    secondDiv.appendChild(deleteButton);
 
     theHeader.appendChild(headerRow);
 

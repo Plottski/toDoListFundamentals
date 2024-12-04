@@ -92,3 +92,26 @@
     padding-left: 50px;
 
 }
+
+#pageHeader {
+    margin-left:36%;
+    padding-top: 10px;
+}
+
+#deleteButton {
+}
+
+#homeButton {
+    margin-left: 7%;
+    margin-bottom: -8%;
+}
+
+#secondDiv {
+    display:inline-block;
+    margin-left: 20%;
+}
+
+#deleteButton {
+    margin-left:80.5%;
+    margin-top:-5%
+}
