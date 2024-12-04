@@ -537,3 +537,8 @@ function addItem() {
         }
     })
 }
+
+function deleteItem() {
+    var itemTable = document.getElementById("tableBody")
+    
+}

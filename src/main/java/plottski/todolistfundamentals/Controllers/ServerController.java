@@ -109,9 +109,28 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-
-
     @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
+    public ResponseEntity<UserItemList> deleteUserItem(HttpSession session, @RequestBody ItemWithCreationDate item) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (userFromDB.getUsername() != null) {
+            ArrayList<ItemWithCreationDate> userListItems = items.findAllByListID(item.getListID());
+            for (int i = 0; i < userListItems.size(); i++) {
+                if (userListItems.get(i).getTitle().equals(item.getTitle())) {
+                    ItemWithCreationDate itemFromDB = userListItems.get(i);
+                    userListItems.remove(i);
+                    items.deleteById(itemFromDB.getId());
+                    UserItemList updatedUserItemList = userLists.findByListName(itemFromDB.getListName());
+                    updatedUserItemList.setUserItems(userListItems);
+                    return new ResponseEntity<>(updatedUserItemList, HttpStatus.OK);
+                }
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+
+   /* @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
     public ResponseEntity<ArrayList<ItemWithCreationDate>> deleteUserItems(HttpSession session, @RequestBody ItemWithCreationDate item) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
         if (userFromDB.getUsername() != null) {
@@ -128,7 +147,7 @@ public class ServerController {
             }
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }
+    } */
 
     @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
     public ResponseEntity<ArrayList<ItemWithCreationDate>> allUserItems(HttpSession session, @RequestBody UserForDB user) {
