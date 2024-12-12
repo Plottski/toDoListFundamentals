@@ -67,10 +67,11 @@ public class ServerController {
 
     @RequestMapping(path = "/add-item", method = RequestMethod.POST)
     public ResponseEntity<UserItemList> addItemtoUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
-        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        if (userFromDB.getUsername() == null) {
+        if (!validUser(session)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+
         setItemDateAndUser(theItem, userFromDB);
 
         ResponseEntity<UserItemList> theUserItemList = getUserItemListResponseEntity(theItem, userFromDB);
@@ -218,6 +219,14 @@ public class ServerController {
         theItem.setUsername(userFromDB.getUsername());
         theItem.setUserID(userFromDB.getId());
         theItem.setUsername(userFromDB.getUsername());
+    }
+
+    public boolean validUser(HttpSession session) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (userFromDB == null || !userFromDB.isLoggedIn()) {
+            return false;
+        }
+        return true;
     }
 }
 
