@@ -53,6 +53,7 @@ function signUp() {
         data: JSON.stringify({"username": uName,
             "password": pw}),
         success: function (data) {
+            sessionStorage.setItem("username", data.username);
             splashPage(data);
             //toDoListDash();
             //navBarDash();
@@ -69,10 +70,12 @@ function signUp() {
 
 function splashPage(data) {
     mainContainer.innerHTML = '';
+    //sessionStorage.setItem('username', data.username);
 
     var splashHeader = document.createElement('header');
-    splashHeader.setAttribute('id', 'splashHeader');
-    splashHeader.innerHTML = 'Welcome ' + data.username + '!';
+    //splashHeader.setAttribute('id', 'splashHeader');
+    splashHeader.innerHTML = 'Welcome ' + sessionStorage.getItem('username')+ '!';
+
 
     var para = document.createElement('p');
     para.setAttribute('id', 'para');
@@ -450,14 +453,20 @@ function addItem() {
             theItemTable.innerHTML = '';
 
             var title = document.getElementById('title');
-            title.innerHTML = 'Title of item';
+            //title.reset();
+            //title.innerHTML = 'Title of item';
+            title.setAttribute('placeholder', 'Title of item');
             console.log(title);
 
             var descrip = document.getElementById('desc');
-            descrip.innerHTML = 'Description of item';
+            //descrip.reset();
+            //descrip.innerHTML = 'Description of item';
+            descrip.setAttribute('placeholder', 'Description of item');
 
             var dueDate = document.getElementById('dueDate');
-            dueDate.innerHTML = 'Due date';
+            //dueDate.reset();
+            //dueDate.innerHTML = 'Due date';
+            dueDate.setAttribute('placeholder', 'Due date');
 
             var theData = [];
             theData = data.userItems;

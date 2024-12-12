@@ -68,37 +68,17 @@ public class ServerController {
     @RequestMapping(path = "/add-item", method = RequestMethod.POST)
     public ResponseEntity<UserItemList> addItemtoUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
-        //put the unformatted due date in a string
-        String theDueDateWhole = theItem.getDueDate();
-        //split the string into an array of strings
-        String[] dateParts = theDueDateWhole.split("-");
-        //order the string to spit out "American" style date formatting
-        String formattedDueDate = dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0];
-        //set the formatted due date and save in the DB
-        theItem.setDueDate(formattedDueDate);
-        theItem.setUsername(userFromDB.getUsername());
-        if (userFromDB.getUsername() != null) {
-            ArrayList<UserItemList> allUserItemLists = userLists.findAll();
-            theItem.setUserID(userFromDB.getId());
-            theItem.setUsername(userFromDB.getUsername());
-            for (int i = 0; i < allUserItemLists.size(); i++) {
-                if (allUserItemLists.get(i).getListName().equals(theItem.getListName())) {
-                    UserItemList theUserItemList = allUserItemLists.get(i);
-                    theUserItemList.setUsername(userFromDB.getUsername());
-                    List<ItemWithCreationDate> itemsList = theUserItemList.getUserItems();
-                    userLists.save(theUserItemList);
-                    UserItemList userItemListForItemListID = userLists.findByListName(theItem.getListName());
-                    theItem.setListID(userItemListForItemListID.getId());
-                    items.save(theItem);
-                    theUserItemList.setUserItems(items.findAllByListID(theItem.getListID()));
-                    return new ResponseEntity<UserItemList>(theUserItemList, HttpStatus.OK);
-                }
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (userFromDB.getUsername() == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        setItemDateAndUser(theItem, userFromDB);
+
+        ResponseEntity<UserItemList> theUserItemList = getUserItemListResponseEntity(theItem, userFromDB);
+        if (theUserItemList != null) return theUserItemList;
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+
 
     @RequestMapping(path = "/delete-item", method = RequestMethod.POST)
     public ResponseEntity<UserItemList> deleteUserItem(HttpSession session, @RequestBody ItemWithCreationDate item) {
@@ -204,6 +184,40 @@ public class ServerController {
             return new ResponseEntity<>(allUserListsNames, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+
+    private ResponseEntity<UserItemList> getUserItemListResponseEntity(ItemWithCreationDate theItem, UserForDB userFromDB) {
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        for (int i = 0; i < allUserItemLists.size(); i++) {
+            if (allUserItemLists.get(i).getListName().equals(theItem.getListName())) {
+                UserItemList theUserItemList = allUserItemLists.get(i);
+                theUserItemList.setUsername(userFromDB.getUsername());
+                List<ItemWithCreationDate> itemsList = theUserItemList.getUserItems();
+                userLists.save(theUserItemList);
+                UserItemList userItemListForItemListID = userLists.findByListName(theItem.getListName());
+                theItem.setListID(userItemListForItemListID.getId());
+                items.save(theItem);
+                theUserItemList.setUserItems(items.findAllByListID(theItem.getListID()));
+                return new ResponseEntity<UserItemList>(theUserItemList, HttpStatus.OK);
+            }
+        }
+        return null;
+    }
+
+    private static void setItemDateAndUser(ItemWithCreationDate theItem, UserForDB userFromDB) {
+        Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
+        //put the unformatted due date in a string
+        String theDueDateWhole = theItem.getDueDate();
+        //split the string into an array of strings
+        String[] dateParts = theDueDateWhole.split("-");
+        //order the string to spit out "American" style date formatting
+        String formattedDueDate = dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0];
+        //set the formatted due date and save in the DB
+        theItem.setDueDate(formattedDueDate);
+        theItem.setUsername(userFromDB.getUsername());
+        theItem.setUserID(userFromDB.getId());
+        theItem.setUsername(userFromDB.getUsername());
     }
 }
 
