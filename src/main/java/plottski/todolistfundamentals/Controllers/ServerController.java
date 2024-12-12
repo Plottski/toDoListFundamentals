@@ -47,7 +47,6 @@ public class ServerController {
         if (users.findByUsername(user.getUsername()) != null) {
             UserForDB userFromDB = users.findByUsername(user.getUsername());
             session.setAttribute("username", userFromDB.getUsername());
-            System.out.println(userFromDB.getUsername());
             userFromDB.setLoggedIn(true);
             session.setAttribute("username", userFromDB.getUsername());
             return new ResponseEntity<UserForDB>(userFromDB, HttpStatus.OK);
@@ -60,7 +59,6 @@ public class ServerController {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
         if (userFromDB.getUsername() != null) {
             userItemList.setUserID(userFromDB.getId());
-            System.out.println(userItemList.getUsername());
             userLists.save(userItemList);
             return new ResponseEntity<>(userItemList, HttpStatus.OK);
         }
@@ -70,8 +68,6 @@ public class ServerController {
     @RequestMapping(path = "/add-item", method = RequestMethod.POST)
     public ResponseEntity<UserItemList> addItemtoUserItemList(HttpSession session, @RequestBody ItemWithCreationDate theItem) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        System.out.println(userFromDB.getUsername());
-        System.out.println(theItem.getCreationTime());
         Instant instant = Instant.ofEpochMilli(theItem.getCreationTime());
         //put the unformatted due date in a string
         String theDueDateWhole = theItem.getDueDate();
@@ -80,13 +76,9 @@ public class ServerController {
         //order the string to spit out "American" style date formatting
         String formattedDueDate = dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0];
         //set the formatted due date and save in the DB
-        System.out.println(formattedDueDate);
         theItem.setDueDate(formattedDueDate);
         theItem.setUsername(userFromDB.getUsername());
-        System.out.println(theItem.getUsername());
         if (userFromDB.getUsername() != null) {
-            //ArrayList<UserItemList> allUserItemLists = userLists.findUserListsByid(userFromDB.getId());
-            //ArrayList<UserItemList> allUserItemLists = userLists.findAllListsByid(userFromDB.getId());
             ArrayList<UserItemList> allUserItemLists = userLists.findAll();
             theItem.setUserID(userFromDB.getId());
             theItem.setUsername(userFromDB.getUsername());
@@ -100,7 +92,6 @@ public class ServerController {
                     theItem.setListID(userItemListForItemListID.getId());
                     items.save(theItem);
                     theUserItemList.setUserItems(items.findAllByListID(theItem.getListID()));
-                    System.out.println(theUserItemList.getUserItems());
                     return new ResponseEntity<UserItemList>(theUserItemList, HttpStatus.OK);
                 }
             }
@@ -109,14 +100,19 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/delete-item", method = RequestMethod.POST)
     public ResponseEntity<UserItemList> deleteUserItem(HttpSession session, @RequestBody ItemWithCreationDate item) {
+        System.out.println(item.getDescription());
+        System.out.println(item.getTitle());
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
         if (userFromDB.getUsername() != null) {
-            ArrayList<ItemWithCreationDate> userListItems = items.findAllByListID(item.getListID());
+            ItemWithCreationDate itemFromDB = items.findByusernameAndTitle(userFromDB.getUsername(), item.getTitle());
+            System.out.println(itemFromDB.getUserID());
+            //ArrayList<ItemWithCreationDate> userListItems = items.findAllByListID(item.getListID());
+            ArrayList<ItemWithCreationDate> userListItems = items.findAllByListID(itemFromDB.getListID());
             for (int i = 0; i < userListItems.size(); i++) {
                 if (userListItems.get(i).getTitle().equals(item.getTitle())) {
-                    ItemWithCreationDate itemFromDB = userListItems.get(i);
+                    ItemWithCreationDate itemToDeleteFromDB = userListItems.get(i);
                     userListItems.remove(i);
                     items.deleteById(itemFromDB.getId());
                     UserItemList updatedUserItemList = userLists.findByListName(itemFromDB.getListName());
@@ -128,26 +124,6 @@ public class ServerController {
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
-
-
-   /* @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
-    public ResponseEntity<ArrayList<ItemWithCreationDate>> deleteUserItems(HttpSession session, @RequestBody ItemWithCreationDate item) {
-        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
-        if (userFromDB.getUsername() != null) {
-            ArrayList<ItemWithCreationDate> allUserItems = items.findAll();
-            System.out.println(item.getTitle());
-            for (int i = 0; i < allUserItems.size(); i++) {
-                if (allUserItems.get(i).getTitle().equals(item.getTitle())) {
-                    System.out.println(allUserItems.get(i).getTitle());
-                    items.delete(allUserItems.get(i));
-                    allUserItems.remove(i);
-                    System.out.println(allUserItems.get(i).getTitle());
-                    return new ResponseEntity<>(allUserItems, HttpStatus.OK);
-                }
-            }
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    } */
 
     @RequestMapping(path = "/get-all-items", method = RequestMethod.POST)
     public ResponseEntity<ArrayList<ItemWithCreationDate>> allUserItems(HttpSession session, @RequestBody UserForDB user) {
@@ -201,18 +177,8 @@ public class ServerController {
             for (int i = 0; i < allUserItemLists.size(); i++) {
                 if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getListName().equals(listName)) {
                     UserItemList theUserItemList = allUserItemLists.get(i);
-                    //theUserItemList.getUserItems().add(items.findAllByListID(theUserItemList.getId()));
-                    // itemsForList = items.findAllByListID(theUserItemList.getId());
-                    //for (int i = 0; i < itemsForList.size(); i ++) {
-                        //ItemWithCreationDate itemForList = new ItemWithCreationDate()
-                        //theUserItemList.getUserItems().add(itemsForList.get(i));
-                    //theUserItemList.getUserItems().add(items.findAllByListID(theUserItemList.getId()))
                     ArrayList<ItemWithCreationDate> allUserListItems = items.findAllByListID(theUserItemList.getId());
                     theUserItemList.setUserItems(allUserListItems);
-                    //for (int y = 0; y < allUserListItems.size(); y++) {
-                    //    theUserItemList.getUserItems().add(allUserListItems.get(y));
-                    //}
-                    //}
                     return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
                 }
             }
@@ -240,6 +206,25 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 }
+
+ /* @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
+    public ResponseEntity<ArrayList<ItemWithCreationDate>> deleteUserItems(HttpSession session, @RequestBody ItemWithCreationDate item) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (userFromDB.getUsername() != null) {
+            ArrayList<ItemWithCreationDate> allUserItems = items.findAll();
+            System.out.println(item.getTitle());
+            for (int i = 0; i < allUserItems.size(); i++) {
+                if (allUserItems.get(i).getTitle().equals(item.getTitle())) {
+                    System.out.println(allUserItems.get(i).getTitle());
+                    items.delete(allUserItems.get(i));
+                    allUserItems.remove(i);
+                    System.out.println(allUserItems.get(i).getTitle());
+                    return new ResponseEntity<>(allUserItems, HttpStatus.OK);
+                }
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    } */
 
     /*@RequestMapping(path = "/get-lists", method = RequestMethod.POST)
     public ResponseEntity<ArrayList<UserItemList>> getUserItemLists(HttpSession session) {

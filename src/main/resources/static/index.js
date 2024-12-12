@@ -353,8 +353,9 @@ function displayItemsPage(data) {
         selectRadio.setAttribute('scope', 'radio');
         selectRadio.setAttribute('type', 'radio');
         selectRadio.setAttribute('name', 'radio' + i);
-        selectRadio.setAttribute('id', 'radio' + i);
+        selectRadio.setAttribute('id', 'selectCol-' + i);
         selectRadio.setAttribute('class', 'form-check-input');
+        //selectRadio.setAttribute('checked', 'false');
 
         selectCol.appendChild(selectRadio);
         /*selectCol.setAttribute('id', 'checkbox' +i);
@@ -380,20 +381,23 @@ function displayItemsPage(data) {
 
         var titleCol = document.createElement('td');
         titleCol.setAttribute('scope', 'col');
-        titleCol.setAttribute('id', 'title' + i);
+        titleCol.setAttribute('id', 'title-' + i);
         titleCol.innerHTML = userItems[i].title;
+
         var descCol = document.createElement('td');
         descCol.setAttribute('scope', 'col');
-        descCol.setAttribute('id', 'desc' + i);
+        descCol.setAttribute('id', 'desc-' + i);
         descCol.innerHTML = userItems[i].description;
+
         var userCol = document.createElement('td');
         userCol.setAttribute('scope', 'col');
-        userCol.setAttribute('id', 'user' + i);
+        userCol.setAttribute('id', 'user-' + i);
         //userCol.innerHTML = theCreator.username;
         userCol.innerHTML = userItems[i].username;
+
         var timeCol = document.createElement('td');
         timeCol.setAttribute('scope', 'col');
-        timeCol.setAttribute('id', 'time' + i);
+        timeCol.setAttribute('id', 'time-' + i);
         timeCol.innerHTML = theCreationDate.toLocaleDateString('en-US');
         //timeCol.innerHTML = userItems[i].toLocaleDateString('en-US');
         //timeCol.innerHTML = date;
@@ -401,7 +405,7 @@ function displayItemsPage(data) {
 
         var dueDateCol = document.createElement('td');
         dueDateCol.setAttribute('scope', 'col');
-        dueDateCol.setAttribute('id', 'dueDate' + i);
+        dueDateCol.setAttribute('id', 'dueDate-' + i);
         dueDateCol.innerHTML = userItems[i].dueDate;
 
         console.log(dueDateCol);
@@ -540,5 +544,42 @@ function addItem() {
 
 function deleteItem() {
     var itemTable = document.getElementById("tableBody")
-    
+    var rows = itemTable.getElementsByTagName("tr");
+    console.log(rows.length);
+    for (var i = 0; i < rows.length; i++) {
+        var radio = document.getElementById("selectCol-" +i);
+        if (radio.checked) {
+            var title = document.getElementById('title-' + i).innerHTML;
+            var desc = document.getElementById('desc-' + i).innerHTML;
+            var userName = document.getElementById('user-' + i).innerHTML;
+            //Date creationDate = new Date().toLocaleDateString('en-US');
+            var creationTime = document.getElementById('time-' + i).innerHTML;
+            var theCreationTime = Date.parse(creationTime);
+            var dueDate = document.getElementById('dueDate-' + i).innerHTML;
+            console.log(title)
+            console.log(desc);
+            console.log(userName);
+            $.ajax({
+                url: "/delete-item",
+                contentType: "application/json",
+                type: "POST",
+                data: JSON.stringify({
+                    "title": title,
+                    "description": desc,
+                    "username": userName,
+                    "creationTime": theCreationTime,
+                    "dueDate": dueDate,
+                }),
+                success: function (data) {
+                    console.log(data);
+                    //itemTable.remove();
+                    //document.getElementsByTagName('radio').checked = false;
+                    displayItemsPage(data)
+                },
+                error: function (xhr) {
+                    console.log("Error has occured");
+                }
+            });
+        }
+    }
 }
