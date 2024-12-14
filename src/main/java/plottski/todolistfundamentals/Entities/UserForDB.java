@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 
 @jakarta.persistence.Entity
+@Table(name = "users")
 public class UserForDB implements Serializable {
 
     @Id

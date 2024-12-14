@@ -6,9 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import plottski.todolistfundamentals.Entities.*;
-import plottski.todolistfundamentals.Services.ItemDB;
-import plottski.todolistfundamentals.Services.UserItemListsRepo;
-import plottski.todolistfundamentals.Services.UserRepo;
+import plottski.todolistfundamentals.Services.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,26 +19,35 @@ public class ServerController {
     @Autowired
     UserRepo users;
 
+    //@Autowired
+    //UserMongoRepo mongoUsers;
+
     @Autowired
     ItemDB items;
 
+   // @Autowired
+   // ItemMongoDB mongoItems;
+
     @Autowired
     UserItemListsRepo userLists;
+
+    //@Autowired
+    //UserItemListsMongoRepo userMongoLists;
 
     private final HashMap<String, User> userDB = new HashMap<String, User>();
     private final HashMap<String, ArrayList<Item>> itemDB = new HashMap<String, ArrayList<Item>>();
 
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
     public ResponseEntity<UserForDB> userSignUp(HttpSession session, @RequestBody UserForDB user) {
-        if (users.findByUsername(user.getUsername()) == null) {
+        if (users.findByUsername(user.getUsername()) != null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
             UserForDB userForDB = new UserForDB(user.getUsername(), user.getPassword(), "plottski@gmail.com", true);
             users.save(userForDB);
             session.setAttribute("username", userForDB.getUsername());
             return new ResponseEntity<UserForDB>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-    }
+}
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public ResponseEntity<UserForDB> userLogin(HttpSession session, @RequestBody UserForDB user) {
