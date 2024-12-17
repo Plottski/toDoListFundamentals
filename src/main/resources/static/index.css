@@ -115,3 +115,14 @@
     margin-left:80.5%;
     margin-top:-5%
 }
+#cardDiv {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid black;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Ensure the card is above other elements */
+}

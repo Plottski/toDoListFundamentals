@@ -37,7 +37,7 @@ public class ServerController {
     private final HashMap<String, User> userDB = new HashMap<String, User>();
     private final HashMap<String, ArrayList<Item>> itemDB = new HashMap<String, ArrayList<Item>>();
 
-    @RequestMapping(path = "/signup", method = RequestMethod.POST)
+    /*@RequestMapping(path = "/signup", method = RequestMethod.POST)
     public ResponseEntity<UserForDB> userSignUp(HttpSession session, @RequestBody UserForDB user) {
         if (users.findByUsername(user.getUsername()) != null) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -47,7 +47,17 @@ public class ServerController {
             users.save(userForDB);
             session.setAttribute("username", userForDB.getUsername());
             return new ResponseEntity<UserForDB>(user, HttpStatus.OK);
-}
+}*/
+    @RequestMapping(path = "/signup", method = RequestMethod.POST)
+    public ResponseEntity<UserForDB> userSignUp(HttpSession session, @RequestBody UserForDB user) {
+        if (users.findByUsername(user.getUsername()) != null && !isValidEmail(user.getEmail())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        user.setLoggedIn(true);
+        users.save(user);
+        session.setAttribute("username", user.getUsername());
+        return new ResponseEntity<UserForDB>(user, HttpStatus.OK);
+    }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public ResponseEntity<UserForDB> userLogin(HttpSession session, @RequestBody UserForDB user) {
@@ -55,7 +65,8 @@ public class ServerController {
             UserForDB userFromDB = users.findByUsername(user.getUsername());
             session.setAttribute("username", userFromDB.getUsername());
             userFromDB.setLoggedIn(true);
-            session.setAttribute("username", userFromDB.getUsername());
+            users.save(userFromDB);
+            //session.setAttribute("username", userFromDB.getUsername());
             return new ResponseEntity<UserForDB>(userFromDB, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -235,7 +246,12 @@ public class ServerController {
         }
         return true;
     }
+
+    public boolean isValidEmail(String email) {
+        return email.contains("@");
+    }
 }
+
 
  /* @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
     public ResponseEntity<ArrayList<ItemWithCreationDate>> deleteUserItems(HttpSession session, @RequestBody ItemWithCreationDate item) {

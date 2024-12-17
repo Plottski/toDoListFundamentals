@@ -4,7 +4,7 @@ window.onload = function() {
     var theButton = document.getElementById('loginButton');
     var signupButton = document.getElementById('signUpButton');
     theButton.addEventListener('click', login);
-    signupButton.addEventListener('click', signUp);
+    signupButton.addEventListener('click', signupForm);
     const xhr = new XMLHttpRequest();
     console.log(mainContainer);
     console.log(theButton);
@@ -39,7 +39,7 @@ function login() {
     })
 }
 
-function signUp() {
+/*function signUp() {
     console.log("signup button functioning");
     var uName = document.querySelector('#username').value;
     var pw = document.querySelector('#password').value;
@@ -66,7 +66,7 @@ function signUp() {
             alert("Username taken");
         }
     })
-}
+} */
 
 function splashPage(data) {
     mainContainer.innerHTML = '';
@@ -591,4 +591,108 @@ function deleteItem() {
             });
         }
     }
+}
+
+function signupForm(event) {
+    event.preventDefault();
+
+    var cardDiv = document.createElement("div");
+    cardDiv.id = "cardDiv";
+
+    var usernameDiv = document.createElement("div");
+    usernameDiv.setAttribute("class", "username");
+
+    var labelForUsername = document.createElement("label");
+    labelForUsername.setAttribute("class", "label");
+    labelForUsername.setAttribute("for", "signupUsername");
+    labelForUsername.innerHTML = "Please enter a username";
+
+    var usernameInput = document.createElement("input");
+    usernameInput.type = "text";
+    usernameInput.placeholder = 'Username'
+    usernameInput.id = 'signupUsername';
+
+    labelForUsername.appendChild(usernameInput);
+    usernameDiv.appendChild(labelForUsername);
+    cardDiv.appendChild(usernameDiv);
+
+    var passwordDiv = document.createElement("div");
+    passwordDiv.setAttribute("class", "password");
+
+    var labelForPassword = document.createElement("label");
+    labelForPassword.setAttribute("class", "label");
+    labelForPassword.setAttribute("for", "signupPassword");
+    labelForPassword.innerHTML = "Please enter your password";
+
+    var passwordInput = document.createElement("input");
+    passwordInput.type = "password";
+    passwordInput.placeholder = 'Password'
+    passwordInput.id = 'signupPassword';
+    //passwordInput.setAttribute('class', 'password');
+
+    labelForPassword.appendChild(passwordInput);
+    passwordDiv.appendChild(labelForPassword);
+    cardDiv.appendChild(passwordDiv);
+    //usernameDiv.appendChild(passwordDiv);
+
+    var emailDiv = document.createElement("div");
+    emailDiv.setAttribute("class", "email");
+
+    var emailLabel = document.createElement("label");
+    emailLabel.setAttribute("class", "label");
+    emailLabel.setAttribute("for", "signupEmail");
+    emailLabel.innerHTML = "Please enter your email";
+
+    var emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.placeholder = 'Email'
+    emailInput.id = 'signupEmail';
+    emailInput.setAttribute('class', 'email');
+
+
+    emailLabel.appendChild(emailInput);
+    //emailInput.appendChild(passwordInput);
+    emailDiv.appendChild(emailLabel);
+    //usernameDiv.appendChild(emailDiv);
+    cardDiv.appendChild(emailDiv);
+
+    var newUserSignupButton = document.createElement("button");
+    newUserSignupButton.setAttribute("class", "btn btn-primary");
+    newUserSignupButton.id = "signupFormButton";
+    newUserSignupButton.innerHTML = "Sign up";
+    newUserSignupButton.addEventListener("click", function () {
+        event.preventDefault();
+        newUserSignup();
+    });
+
+    cardDiv.appendChild(newUserSignupButton);
+    var container = document.getElementById("mainContainer");
+    container.appendChild(cardDiv);
+}
+
+function newUserSignup() {
+    var usernameFromSignupForm = document.getElementById('signupUsername').value;
+    var passwordFromSignupForm = document.getElementById('signupPassword').value;
+    var emailFromSignupForm = document.getElementById('signupEmail').value;
+
+    console.log(usernameFromSignupForm);
+    console.log(passwordFromSignupForm);
+    console.log(emailFromSignupForm);
+
+    $.ajax({
+        url: "/signup",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({username: usernameFromSignupForm,
+            password: passwordFromSignupForm,
+            email: emailFromSignupForm}),
+        success: function (data) {
+            console.log(data);
+            sessionStorage.setItem("username", data.username);
+            splashPage(data);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
 }
