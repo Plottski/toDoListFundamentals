@@ -8,7 +8,6 @@ window.onload = function() {
     const xhr = new XMLHttpRequest();
     console.log(mainContainer);
     console.log(theButton);
-    //const navBar = createNavBar();
 }
 
 function login() {
@@ -25,10 +24,6 @@ function login() {
         data: JSON.stringify({username: uName,
             password: pw}),
         success: function (data) {
-            console.log(data);
-            //lookForItems(data);
-            // toDoListDash();
-            //createNavBar();
             splashPage(data);
         },
         error: function (xhr) {
@@ -39,41 +34,10 @@ function login() {
     })
 }
 
-/*function signUp() {
-    console.log("signup button functioning");
-    var uName = document.querySelector('#username').value;
-    var pw = document.querySelector('#password').value;
-    console.log(pw);
-    console.log(uName);
-
-    $.ajax ({
-        url: "/signup",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({"username": uName,
-            "password": pw}),
-        success: function (data) {
-            sessionStorage.setItem("username", data.username);
-            splashPage(data);
-            //toDoListDash();
-            //navBarDash();
-            //createNavBar();
-            //createNavBar();
-
-        },
-        error: function (data) {
-            console.log("Error has occured");
-            alert("Username taken");
-        }
-    })
-} */
-
 function splashPage(data) {
     mainContainer.innerHTML = '';
-    //sessionStorage.setItem('username', data.username);
 
     var splashHeader = document.createElement('header');
-    //splashHeader.setAttribute('id', 'splashHeader');
     splashHeader.innerHTML = 'Welcome ' + sessionStorage.getItem('username')+ '!';
 
 
@@ -170,7 +134,6 @@ function createNewList(listName) {
 }
 
 function getSpecificList(data) {
-    console.log(data);
     var listName = data;
     $.ajax({
         url: "/find-specific-list",
@@ -178,7 +141,6 @@ function getSpecificList(data) {
         contentType: "application/json",
         data: listName,
         success: function (data) {
-            console.log(data);
             displayItemsPage(data);
         },
         error: function (xhr) {
@@ -188,16 +150,11 @@ function getSpecificList(data) {
 }
 
 function displayItemsPage(data) {
-    console.log(data);
     mainContainer.innerHTML = '';
-
-    console.log(data.userItems);
 
     var userItems = [];
 
     userItems = data.userItems;
-
-    console.log(userItems);
 
     var firstDiv = document.createElement('div');
     firstDiv.id = 'itemDiv';
@@ -245,8 +202,6 @@ function displayItemsPage(data) {
     firstDiv.appendChild(descInput);
     firstDiv.appendChild(dueDateInput);
     firstDiv.appendChild(addButton);
-    //firstDiv.appendChild(homeButton);
-    //firstDiv.appendChild(pageHeader);
 
     var secondDiv = document.createElement('div');
     secondDiv.id = 'secondDiv';
@@ -259,9 +214,6 @@ function displayItemsPage(data) {
 
     mainContainer.appendChild(secondDiv);
 
-    //var deleteButtonDiv = document.createElement('div');
-    //deleteButtonDiv.id = 'deleteButtonDiv';
-
     var deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.id = 'deleteButton';
@@ -271,13 +223,6 @@ function displayItemsPage(data) {
         event.preventDefault();
         deleteItem();
     });
-
-    //deleteButtonDiv.appendChild(deleteButton);
-
-    //logoutDiv.appendChild(logoutButton);
-
-    //mainContainer.appendChild(logoutDiv);
-    //mainContainer.appendChild(deleteButtonDiv);
 
     var tableDiv = document.createElement('div');
     tableDiv.id = 'tableDiv';
@@ -327,7 +272,6 @@ function displayItemsPage(data) {
     headerRow.appendChild(userHeader);
     headerRow.appendChild(timeHeader);
     headerRow.appendChild(dueDateHeader);
-    //headerRow.appendChild(deleteHeader);
 
     secondDiv.appendChild(deleteButton);
 
@@ -339,8 +283,6 @@ function displayItemsPage(data) {
     var tableBody = document.createElement('tbody');
     tableBody.id = 'tableBody';
     tableBody.className = 'table-hover';
-
-    //var itemTable = document.getElementById('itemTable');
 
     for (var i = 0; i < userItems.length; i++) {
         var row = document.createElement('tr');
@@ -358,27 +300,9 @@ function displayItemsPage(data) {
         selectRadio.setAttribute('name', 'radio' + i);
         selectRadio.setAttribute('id', 'selectCol-' + i);
         selectRadio.setAttribute('class', 'form-check-input');
-        //selectRadio.setAttribute('checked', 'false');
 
         selectCol.appendChild(selectRadio);
-        /*selectCol.setAttribute('id', 'checkbox' +i);
-        selectCol.setAttribute('class', 'form-check-input');
-        selectCol.setAttribute('type', 'checkbox');
-        selectCol.setAttribute('value', '');
-        selectCol.setAttribute('name', 'checkbox' +i);
-        //selectCol.setAttribute('style', 'background: white');*/
 
-        /*var selectLabel = document.createElement('label');
-        selectLabel.setAttribute('class', 'form-check-label text-white');
-        selectLabel.setAttribute('for', 'checbox' +i);*/
-
-        //selectCol.appendChild(selectLabel);
-
-        //var date = new Date(data[i].creationTime);
-
-        //var dueDate = new Date(data[i].dueDate);
-
-        console.log(dueDate);
 
         var theCreationDate = new Date(userItems[i].creationTime);
 
@@ -395,25 +319,17 @@ function displayItemsPage(data) {
         var userCol = document.createElement('td');
         userCol.setAttribute('scope', 'col');
         userCol.setAttribute('id', 'user-' + i);
-        //userCol.innerHTML = theCreator.username;
         userCol.innerHTML = userItems[i].username;
 
         var timeCol = document.createElement('td');
         timeCol.setAttribute('scope', 'col');
         timeCol.setAttribute('id', 'time-' + i);
         timeCol.innerHTML = theCreationDate.toLocaleDateString('en-US');
-        //timeCol.innerHTML = userItems[i].toLocaleDateString('en-US');
-        //timeCol.innerHTML = date;
-        //timeCol.innerHtml = Date(data[i].creationTime);
 
         var dueDateCol = document.createElement('td');
         dueDateCol.setAttribute('scope', 'col');
         dueDateCol.setAttribute('id', 'dueDate-' + i);
         dueDateCol.innerHTML = userItems[i].dueDate;
-
-        console.log(dueDateCol);
-
-        //console.log(data[i].creationTime);
 
         row.appendChild(selectCol);
         row.appendChild(titleCol);
@@ -453,19 +369,13 @@ function addItem() {
             theItemTable.innerHTML = '';
 
             var title = document.getElementById('title');
-            //title.reset();
-            //title.innerHTML = 'Title of item';
             title.setAttribute('placeholder', 'Title of item');
             console.log(title);
 
             var descrip = document.getElementById('desc');
-            //descrip.reset();
-            //descrip.innerHTML = 'Description of item';
             descrip.setAttribute('placeholder', 'Description of item');
 
             var dueDate = document.getElementById('dueDate');
-            //dueDate.reset();
-            //dueDate.innerHTML = 'Due date';
             dueDate.setAttribute('placeholder', 'Due date');
 
             var theData = [];
@@ -478,12 +388,6 @@ function addItem() {
             for (var i = 0; i <theData.length; i++) {
 
                 var theCreationDate = new Date(theData[i].creationTime);
-                console.log(theCreationDate);
-
-               // var theDueDate = theData[i].dueDate;
-
-                //var theDueDate = new Date(data[i].userItems[i].dueDate);
-                //var theDueDate = new Date(theData[i].dueDate);
 
                 var newRow = document.createElement("tr");
                 newRow.setAttribute('scope', 'row');
