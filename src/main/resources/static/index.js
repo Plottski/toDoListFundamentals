@@ -242,22 +242,32 @@ function displayItemsPage(data) {
 
     var titleHeader = document.createElement('th');
     titleHeader.setAttribute('scope', 'col');
+    titleHeader.setAttribute('id', 'tableTitleHeader');
+    titleHeader.addEventListener('click', sortByTitle);
     titleHeader.innerHTML = 'Title';
 
     var descHeader = document.createElement('th');
     descHeader.setAttribute('scope', 'col');
+    descHeader.setAttribute('id', 'tableDescHeader');
+    descHeader.addEventListener('click', sortByDescription)
     descHeader.innerHTML = 'Description';
 
     var userHeader = document.createElement('th');
     userHeader.setAttribute('scope', 'col');
+    userHeader.setAttribute('id', 'tableUserHeader');
+    userHeader.addEventListener('click', sortByUser);
     userHeader.innerHTML = 'User';
 
     var timeHeader = document.createElement('th');
     timeHeader.setAttribute('scope', 'col');
+    timeHeader.setAttribute('id', 'tableTimeHeader');
+    timeHeader.addEventListener('click', sortByCreationTime);
     timeHeader.innerHTML = 'Created';
 
     var dueDateHeader = document.createElement('th');
     dueDateHeader.setAttribute('scope', 'col');
+    dueDateHeader.setAttribute('id', 'tableDueDateHeader');
+    dueDateHeader.addEventListener('click', sortByDueDate)
     dueDateHeader.innerHTML = 'Due Date';
 
     var deleteHeader = document.createElement('th');
@@ -599,4 +609,79 @@ function newUserSignup() {
             console.log("Error has occured");
         }
     })
+}
+
+function sortByTitle(event) {
+    event.preventDefault();
+    var tableBody = document.getElementById("tableBody");
+    var rows = tableBody.getElementsByTagName("tr");
+
+    const titles = [];
+    const notSortedTitles = [];
+    var rowsToAppend = [];
+    console.log(rows.length);
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        titles.push(document.getElementById('title-' + i).innerHTML);
+        notSortedTitles.push(document.getElementById('title-' + i).innerHTML);
+        rowsToAppend.push(row);
+    }
+
+    const sortedTitles = titles.sort();
+    console.log(notSortedTitles);
+    console.log(sortedTitles);
+
+    tableBody.remove(document.getElementsByTagName('tr'));
+
+    //iterate through all rows until rows = 0
+
+        for (let j = 0, k = 0; k < rowsToAppend.length;) {
+            //var rowTitle = document.getElementById('title-' + k).innerHTML;
+            //if the title in the row matches the sorted row append that row to the table and remove that row from the array of rows?
+            if (sortedTitles[j] !== notSortedTitles[k]) {
+                j++;
+                k = 0;
+            }
+                console.log(sortedTitles[j]);
+                console.log(notSortedTitles[k]);
+                sortedTitles.splice(j, 1);
+                notSortedTitles.splice(k, 1);
+                tableBody.appendChild(rowsToAppend[k]);
+                rowsToAppend.splice(k, 1);
+                //tableBody.insertBefore(rows[k], rows[k]);
+                //tableBody.appendChild(rowsToAppend[k]);
+
+                //tableBody.appendChild(rowsToAppend[j]);
+                //tableBody.appendChild(rows[j]);
+                //rows.removeChild(rows[j]);
+
+                //Reset iterator so it starts from the beginning again
+                j = 0;
+                //console.log(rowsToAppend);
+                k++;
+            }
+    theTable = document.getElementById("itemTable");
+    theTable.appendChild(tableBody);
+    console.log(rowsToAppend);
+}
+
+
+
+        //tableBody.remove(document.getElementsByTagName('tr'));
+        //tableBody.append(rowsToAppend);
+
+function sortByDescription(event) {
+    event.preventDefault();
+}
+
+function sortByUser(event) {
+    event.preventDefault();
+}
+
+function sortByCreationTime(event) {
+    event.preventDefault();
+}
+
+function sortByDueDate(event) {
+    event.preventDefault();
 }
