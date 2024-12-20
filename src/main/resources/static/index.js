@@ -536,26 +536,32 @@ function displayItemsPage(data) {
         titleCol.setAttribute('scope', 'col');
         titleCol.setAttribute('id', 'title-' + i);
         titleCol.innerHTML = userItems[i].title;
+        titleCol.style.cursor = 'pointer';
+        titleCol.addEventListener('click', filterByTitle);
 
         var descCol = document.createElement('td');
         descCol.setAttribute('scope', 'col');
         descCol.setAttribute('id', 'desc-' + i);
         descCol.innerHTML = userItems[i].description;
+        descCol.style.cursor = 'pointer';
 
         var userCol = document.createElement('td');
         userCol.setAttribute('scope', 'col');
         userCol.setAttribute('id', 'user-' + i);
         userCol.innerHTML = userItems[i].username;
+        userCol.style.cursor = 'pointer';
 
         var timeCol = document.createElement('td');
         timeCol.setAttribute('scope', 'col');
         timeCol.setAttribute('id', 'time-' + i);
         timeCol.innerHTML = theCreationDate.toLocaleDateString('en-US');
+        timeCol.style.cursor = 'pointer';
 
         var dueDateCol = document.createElement('td');
         dueDateCol.setAttribute('scope', 'col');
         dueDateCol.setAttribute('id', 'dueDate-' + i);
         dueDateCol.innerHTML = userItems[i].dueDate;
+        dueDateCol.style.cursor = 'pointer';
 
         row.appendChild(selectCol);
         row.appendChild(titleCol);
@@ -635,6 +641,7 @@ function addItem() {
                 titleCol.setAttribute('id', 'title-' + i);
                 //titleCol.innerHTML = data[i].userItems[i].title;
                 titleCol.innerHTML = theData[i].title;
+                titleCol.appendChild(filterByTitle);
 
                 var descCol = document.createElement('td');
                 descCol.setAttribute('scope', 'col');
@@ -946,6 +953,29 @@ function sortDescendingByTitle(event) {
 
     titleSortHeader.addEventListener('click', sortByTitle);
     titleSortHeader.style.cursor = 'pointer';
+}
+
+function filterByTitle(event) {
+    event.preventDefault();
+    var title = event.target.innerHTML;
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(title);
+    console.log(listName);
+    $.ajax({
+        url: '/filterByTitle',
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            title: title,
+            listName: listName,
+        }),
+        success: function (data) {
+            displayItemsPage(data);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
 }
 
         //tableBody.remove(document.getElementsByTagName('tr'));

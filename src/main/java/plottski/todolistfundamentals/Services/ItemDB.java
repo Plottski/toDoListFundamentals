@@ -9,13 +9,16 @@ import java.util.List;
 
 
 public interface ItemDB extends CrudRepository<ItemWithCreationDate, Integer> {
-    //ItemWithCreationDate findByTitle(String title);
+    ItemWithCreationDate findByTitle(String title);
 
     //ItemWithCreationDate findByUserID(int id);
 
     ItemWithCreationDate findByusernameAndTitle(String username, String title);
 
-    ItemWithCreationDate findByid(int id);
+    ArrayList<ItemWithCreationDate> findAllByUserIDAndTitle(int userID, String title);
+
+    //@Query(value = "SELECT * FROM items WHERE userID = ?1 AND title = ?1")
+    //ArrayList<ItemWithCreationDate> findAllByUserIDAndTitle(int userID, String title);
 
     @Query(value = "SELECT * FROM items WHERE userID = ?1", nativeQuery = true)
     ItemWithCreationDate findByUserIDNative(int id);

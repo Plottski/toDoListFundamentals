@@ -425,26 +425,30 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @RequestMapping(path = "/filterByTitle", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> filterItemsByTitle(HttpSession session, @RequestBody HashMap<String, String> json) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndTitle(userFromDB.getId(), json.get("title"));
+        UserItemList userItemList = userLists.findByListName(json.get("listName"));
+        System.out.println(json.get("listName"));
+        System.out.println(json.get("title"));
+        if (userItemList == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userItemList.setUserItems(userItems);
+        return new ResponseEntity<>(userItemList, HttpStatus.OK);
+
+    }
+
     Comparator<ItemWithCreationDate> dueDateComparator = new Comparator<ItemWithCreationDate>() {
         @Override
         public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
             return item1.getDueDate().compareTo(item2.getDueDate());
         }
     };
-
-
-    /*Comparator<ItemWithCreationDate> dueDateComparator = new Comparator<ItemWithCreationDate>() {
-        DateFormat stringToDate = new SimpleDateFormat("mm/dd/yyyy");
-        @Override
-        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
-            try {
-                return stringToDate.parse(item1.getDescription()).compareTo(stringToDate.parse(item2.getDescription()));
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    };*/
-
 
     Comparator<ItemWithCreationDate> creationDateComparator = new Comparator<ItemWithCreationDate>() {
         @Override
@@ -566,7 +570,25 @@ public class ServerController {
     }
 
 }
-        //UserItemList specificList = getSpecificUserItemList(session, listName, userFromDB);
+
+
+
+
+
+/*Comparator<ItemWithCreationDate> dueDateComparator = new Comparator<ItemWithCreationDate>() {
+        DateFormat stringToDate = new SimpleDateFormat("mm/dd/yyyy");
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            try {
+                return stringToDate.parse(item1.getDescription()).compareTo(stringToDate.parse(item2.getDescription()));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };*/
+
+
+//UserItemList specificList = getSpecificUserItemList(session, listName, userFromDB);
         //System.out.println(specificList);
         //System.out.println(specificList.getUsername());
         //System.out.println(specificList.getListName());
