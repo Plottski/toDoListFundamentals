@@ -149,6 +149,217 @@ function getSpecificList(data) {
     })
 }
 
+function sortByTitleAscending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-ascending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var titleHeaderToChange = document.getElementById("tableTitleHeader");
+            titleHeaderToChange.removeEventListener('click', sortByTitleAscending);
+            titleHeaderToChange.addEventListener('click', sortByTitleDescending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByTitleDescending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-descending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var titleHeaderToChange = document.getElementById("tableTitleHeader");
+            titleHeaderToChange.removeEventListener("click", sortByTitleDescending);
+            titleHeaderToChange.addEventListener("click", sortByTitleAscending);
+
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByDescriptionAscending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-descriptions-ascending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var descriptionHeaderToChange = document.getElementById("tableDescHeader");
+            descriptionHeaderToChange.removeEventListener('click', sortByDescriptionAscending);
+            descriptionHeaderToChange.addEventListener('click', sortByDescriptionDescending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByDescriptionDescending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-descriptions-descending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var descriptionHeaderToChange = document.getElementById("tableDescHeader");
+            descriptionHeaderToChange.removeEventListener('click', sortByDescriptionDescending);
+            descriptionHeaderToChange.addEventListener('click', sortByDescriptionAscending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByUserAscending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-users-descending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var userHeaderToChange = document.getElementById("tableUserHeader");
+            userHeaderToChange.removeEventListener('click', sortByUserAscending);
+            userHeaderToChange.addEventListener('click', sortByUserDescending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByUserDescending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-users-descending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var userHeaderToChange = document.getElementById("tableUserHeader");
+            userHeaderToChange.removeEventListener('click', sortByUserDescending);
+            userHeaderToChange.addEventListener('click', sortByUserAscending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByCreationDateAscending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-creationdate-ascending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var timeHeaderToChange = document.getElementById("tableTimeHeader");
+            timeHeaderToChange.removeEventListener('click', sortByCreationDateAscending);
+            timeHeaderToChange.addEventListener('click', sortByCreationDateDescending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByCreationDateDescending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-creationdate-descending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var timeHeaderToChange = document.getElementById("tableTimeHeader");
+            timeHeaderToChange.removeEventListener('click', sortByCreationDateDescending);
+            timeHeaderToChange.addEventListener('click', sortByCreationDateAscending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByDueDateAscending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-duedate-ascending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var dueDateHeaderToChange = document.getElementById("tableDueDateHeader");
+            dueDateHeaderToChange.removeEventListener('click', sortByDueDateAscending);
+            dueDateHeaderToChange.addEventListener('click', sortByDueDateDescending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function sortByDueDateDescending(event) {
+    event.preventDefault();
+    var listName = document.getElementById("pageHeader").innerHTML;
+    console.log(listName);
+    $.ajax({
+        url: "/sort-items-duedate-descending",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+            var dueDateHeaderToChange = document.getElementById("tableDueDateHeader");
+            dueDateHeaderToChange.removeEventListener('click', sortByDueDateDescending);
+            dueDateHeaderToChange.addEventListener('click', sortByDueDateAscending);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
 function displayItemsPage(data) {
     mainContainer.innerHTML = '';
 
@@ -243,32 +454,37 @@ function displayItemsPage(data) {
     var titleHeader = document.createElement('th');
     titleHeader.setAttribute('scope', 'col');
     titleHeader.setAttribute('id', 'tableTitleHeader');
-    titleHeader.addEventListener('click', sortByTitle);
+    titleHeader.addEventListener('click', sortByTitleAscending);
     titleHeader.innerHTML = 'Title';
+    titleHeader.style.cursor = 'pointer';
 
     var descHeader = document.createElement('th');
     descHeader.setAttribute('scope', 'col');
     descHeader.setAttribute('id', 'tableDescHeader');
-    descHeader.addEventListener('click', sortByDescription)
+    descHeader.addEventListener('click', sortByDescriptionAscending)
     descHeader.innerHTML = 'Description';
+    descHeader.style.cursor = 'pointer';
 
     var userHeader = document.createElement('th');
     userHeader.setAttribute('scope', 'col');
     userHeader.setAttribute('id', 'tableUserHeader');
-    userHeader.addEventListener('click', sortByUser);
+    userHeader.addEventListener('click', sortByUserAscending);
     userHeader.innerHTML = 'User';
+    userHeader.style.cursor = 'pointer';
 
     var timeHeader = document.createElement('th');
     timeHeader.setAttribute('scope', 'col');
     timeHeader.setAttribute('id', 'tableTimeHeader');
-    timeHeader.addEventListener('click', sortByCreationTime);
+    timeHeader.addEventListener('click', sortByCreationDateAscending);
     timeHeader.innerHTML = 'Created';
+    timeHeader.style.cursor = 'pointer';
 
     var dueDateHeader = document.createElement('th');
     dueDateHeader.setAttribute('scope', 'col');
     dueDateHeader.setAttribute('id', 'tableDueDateHeader');
-    dueDateHeader.addEventListener('click', sortByDueDate)
+    dueDateHeader.addEventListener('click', sortByDueDateAscending)
     dueDateHeader.innerHTML = 'Due Date';
+    dueDateHeader.style.cursor = 'pointer';
 
     var deleteHeader = document.createElement('th');
     deleteHeader.setAttribute('scope', 'col');
@@ -663,9 +879,74 @@ function sortByTitle(event) {
     theTable = document.getElementById("itemTable");
     theTable.appendChild(tableBody);
     console.log(rowsToAppend);
+
+    var titleSortHeader = document.getElementById('tableTitleHeader');
+    titleSortHeader.removeEventListener('click', sortByTitle);
+
+    titleSortHeader.addEventListener('click', sortDescendingByTitle);
+    titleSortHeader.style.cursor = 'pointer';
 }
 
+function sortDescendingByTitle(event) {
+    event.preventDefault();
 
+    var tableBody = document.getElementById("tableBody");
+    var rows = tableBody.getElementsByTagName("tr");
+
+    const titles = [];
+    const notSortedTitles = [];
+    var rowsToAppend = [];
+    console.log(rows.length);
+
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        titles.push(document.getElementById('title-' + i).innerHTML);
+        notSortedTitles.push(document.getElementById('title-' + i).innerHTML);
+        rowsToAppend.push(row);
+    }
+
+    const sortedTitles = titles.sort();
+    sortedTitles.reverse();
+    console.log(notSortedTitles);
+    console.log(sortedTitles);
+
+    tableBody.remove(document.getElementsByTagName('tr'));
+
+    for (let j = 0, k = 0; k < rowsToAppend.length;) {
+        //var rowTitle = document.getElementById('title-' + k).innerHTML;
+        //if the title in the row matches the sorted row append that row to the table and remove that row from the array of rows?
+        if (sortedTitles[j] !== notSortedTitles[k]) {
+            j++;
+            k = 0;
+        }
+        console.log(sortedTitles[j]);
+        console.log(notSortedTitles[k]);
+        sortedTitles.splice(j, 1);
+        notSortedTitles.splice(k, 1);
+        tableBody.appendChild(rowsToAppend[k]);
+        rowsToAppend.splice(k, 1);
+        //tableBody.insertBefore(rows[k], rows[k]);
+        //tableBody.appendChild(rowsToAppend[k]);
+
+        //tableBody.appendChild(rowsToAppend[j]);
+        //tableBody.appendChild(rows[j]);
+        //rows.removeChild(rows[j]);
+
+        //Reset iterator so it starts from the beginning again
+        j = 0;
+        //console.log(rowsToAppend);
+        k++;
+    }
+    theTable = document.getElementById("itemTable");
+    theTable.appendChild(tableBody);
+    console.log(rowsToAppend);
+
+    var titleSortHeader = document.getElementById('tableTitleHeader');
+    titleSortHeader.removeEventListener('click', sortDescendingByTitle);
+
+    titleSortHeader.addEventListener('click', sortByTitle);
+    titleSortHeader.style.cursor = 'pointer';
+}
 
         //tableBody.remove(document.getElementsByTagName('tr'));
         //tableBody.append(rowsToAppend);

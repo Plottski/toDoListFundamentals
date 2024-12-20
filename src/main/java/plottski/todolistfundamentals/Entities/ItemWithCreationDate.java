@@ -39,7 +39,7 @@ public class ItemWithCreationDate {
     @ManyToOne
     private UserItemList listOfItems;
 
-    public ItemWithCreationDate(){
+    public ItemWithCreationDate() {
 
     }
 
@@ -130,6 +130,29 @@ public class ItemWithCreationDate {
     public void setListOfItems(UserItemList listOfItems) {
         this.listOfItems = listOfItems;
     }
+}
+
+
+
+   /* @Override
+    public int compareTo(ItemWithCreationDate item) {
+        return this.title.compareTo(item.title);
+    }
+
+    @Override
+    public String toString() {
+        return "ItemWithCreationDate{" +
+                "title='" + title + '\'' +
+                ", description=" + description + '\'' +
+                ", creationTime=" + creationTime + '\'' +
+                ", userId=" + userID + '\'' +
+                ", username=" + username + '\'' +
+                ", listID=" + listID + '\'' +
+                ", listName=" + listName + '\'' +
+                ", dueDate=" + dueDate + '\'' +
+                ", listOfItems=" + listOfItems +
+                '}';
+    } */
 
     /*
     public ItemWithCreationDate(String title, String description, Long creationTime, int userID, int listID, String username, String listName, String dueDate) {
@@ -214,4 +237,3 @@ public class ItemWithCreationDate {
     public void setListOfItems(UserItemList listOfItems) {
         this.listOfItems = listOfItems;
     } */
-}

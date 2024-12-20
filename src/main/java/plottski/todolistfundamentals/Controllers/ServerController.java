@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.*;
 import plottski.todolistfundamentals.Entities.*;
 import plottski.todolistfundamentals.Services.*;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
+import static java.lang.Double.parseDouble;
 
 @RestController
 public class ServerController {
@@ -25,8 +28,8 @@ public class ServerController {
     @Autowired
     ItemDB items;
 
-   // @Autowired
-   // ItemMongoDB mongoItems;
+    // @Autowired
+    // ItemMongoDB mongoItems;
 
     @Autowired
     UserItemListsRepo userLists;
@@ -96,7 +99,6 @@ public class ServerController {
         if (theUserItemList != null) return theUserItemList;
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
 
 
     @RequestMapping(path = "/delete-item", method = RequestMethod.POST)
@@ -171,6 +173,7 @@ public class ServerController {
     @RequestMapping(path = "/find-specific-list", method = RequestMethod.POST)
     public ResponseEntity<UserItemList> findSpecificList(HttpSession session, @RequestBody String listName) {
         UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        //sortItemsAscending(session,listName);
         if (userFromDB.getUsername() != null) {
             ArrayList<UserItemList> allUserItemLists = userLists.findAll();
             for (int i = 0; i < allUserItemLists.size(); i++) {
@@ -250,7 +253,344 @@ public class ServerController {
     public boolean isValidEmail(String email) {
         return email.contains("@");
     }
+
+    @RequestMapping(path = "/sort-items-ascending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsAscending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-descending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsDescending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(titleDescendingComparator);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-descriptions-ascending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsByDescriptionAscending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(descriptionAscendingComparator);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-descriptions-descending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsByDescriptionDescending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(descriptionDescendingComparator);
+            Collections.reverse(itemsToSort);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-users-ascending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsByUsersAscending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(usersComparator);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-users-descending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsByUsersDescending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(usersComparator);
+            Collections.reverse(itemsToSort);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-creationdate-ascending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsByCreationDateAscending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(creationDateComparator);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-creationdate-descending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsByCreationDateDescending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(creationDateComparator);
+            Collections.reverse(itemsToSort);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-duedate-ascending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsByDueDateAscending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(dueDateComparator);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/sort-items-duedate-descending", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> sortItemsByDueDateDescending(HttpSession session, @RequestBody String listName) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        UserItemList theUserItemList = findAndSortUserListAscending(allUserItemLists, userFromDB, listName);
+        if (theUserItemList != null) {
+            ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+            itemsToSort.sort(dueDateComparator);
+            Collections.reverse(itemsToSort);
+            theUserItemList.setUserItems(itemsToSort);
+            return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    Comparator<ItemWithCreationDate> dueDateComparator = new Comparator<ItemWithCreationDate>() {
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            return item1.getDueDate().compareTo(item2.getDueDate());
+        }
+    };
+
+
+    /*Comparator<ItemWithCreationDate> dueDateComparator = new Comparator<ItemWithCreationDate>() {
+        DateFormat stringToDate = new SimpleDateFormat("mm/dd/yyyy");
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            try {
+                return stringToDate.parse(item1.getDescription()).compareTo(stringToDate.parse(item2.getDescription()));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };*/
+
+
+    Comparator<ItemWithCreationDate> creationDateComparator = new Comparator<ItemWithCreationDate>() {
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            return item1.getCreationTime().compareTo(item2.getCreationTime());
+        }
+    };
+
+    Comparator<ItemWithCreationDate> usersComparator = new Comparator<ItemWithCreationDate>() {
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            return item1.getUsername().compareToIgnoreCase(item2.getUsername());
+        }
+    };
+
+
+
+
+    Comparator<ItemWithCreationDate> titleComparator = new Comparator<ItemWithCreationDate>() {
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            return item1.getTitle().compareToIgnoreCase(item2.getTitle());
+        }
+    };
+
+    Comparator<ItemWithCreationDate> titleDescendingComparator = new Comparator<ItemWithCreationDate>() {
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            return item2.getTitle().compareToIgnoreCase(item1.getTitle());
+        }
+    };
+
+    Comparator<ItemWithCreationDate> descriptionAscendingComparator = new Comparator<ItemWithCreationDate>() {
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            if (item1.getDescription() instanceof String && item2.getDescription() instanceof String) {
+                return item1.getDescription().compareToIgnoreCase( item2.getDescription());
+            }
+            else {
+                try {
+                    Double numberDescriptionitem1 = parseDouble(item1.getDescription());
+                    Double numberDescriptionItem2 = parseDouble(item1.getDescription());
+                    if (numberDescriptionItem2 != null && numberDescriptionitem1 != null) {
+                        return Double.compare(numberDescriptionitem1, numberDescriptionItem2);
+                    } else if (numberDescriptionItem2 != null) {
+                        return -1;
+                    } else if (numberDescriptionitem1 != null) {
+                        return 1;
+                    } else if (item2.getDescription() instanceof String) {
+                        return -1;
+                    } else if (item1.getDescription() instanceof String) {
+                        return 1;
+                    }
+                    return 0;
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    };
+
+    Comparator<ItemWithCreationDate> descriptionDescendingComparator = new Comparator<ItemWithCreationDate>() {
+        @Override
+        public int compare(ItemWithCreationDate item1, ItemWithCreationDate item2) {
+            if (item1.getDescription() instanceof String && item2.getDescription() instanceof String) {
+                return item1.getDescription().compareToIgnoreCase( item2.getDescription());
+            }
+            else {
+                try {
+                    Double numberDescriptionitem1 = parseDouble(item1.getDescription());
+                    Double numberDescriptionItem2 = parseDouble(item1.getDescription());
+                    if (numberDescriptionitem1 != null && numberDescriptionItem2 != null) {
+                        return Double.compare(numberDescriptionitem1, numberDescriptionItem2);
+                    } else if (numberDescriptionitem1 != null) {
+                        return 1;
+                    } else if (numberDescriptionItem2 != null) {
+                        return -1;
+                    } else if (item1.getDescription() instanceof String) {
+                        return 1;
+                    } else if (item2.getDescription() instanceof String) {
+                        return -1;
+                    }
+                    return 0;
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    };
+
+
+    public UserItemList findAndSortUserListAscending(ArrayList<UserItemList> allUserItemLists, UserForDB userFromDB, String listName) {
+        for (int i = 0; i < allUserItemLists.size(); i++) {
+            if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getListName().equals(listName)) {
+                UserItemList theUserItemList = allUserItemLists.get(i);
+                ArrayList<ItemWithCreationDate> itemsToSort = items.findAllByListID(theUserItemList.getId());
+                itemsToSort.sort(titleComparator);
+                theUserItemList.setUserItems(itemsToSort);
+                return theUserItemList;
+            }
+        }
+        return null;
+    }
+
+
+    public UserItemList getSpecificUserItemList(HttpSession session, String listName, UserForDB userFromDB) {
+        ArrayList<UserItemList> allUserItemLists = userLists.findAll();
+        System.out.println(listName);
+        System.out.println(userFromDB.getUsername());
+        for (int i = 0; i < allUserItemLists.size(); i++) {
+            //System.out.println(allUserItemLists.get(i));
+            if (allUserItemLists.get(i).getUserID() == userFromDB.getId() && allUserItemLists.get(i).getListName().equals(listName)) {
+                UserItemList theUserItemList = allUserItemLists.get(i);
+                System.out.println(theUserItemList.getUsername());
+                return theUserItemList;
+            }
+        }
+        return null;
+    }
+
 }
+        //UserItemList specificList = getSpecificUserItemList(session, listName, userFromDB);
+        //System.out.println(specificList);
+        //System.out.println(specificList.getUsername());
+        //System.out.println(specificList.getListName());
+        //System.out.println(specificList.getId());
+
+        //Collections.sort(itemsToSort);
+
+        //ArrayList<String> itemTitleStrings = new ArrayList<>();
+        //for (int i = 0; i < itemsToSort.size(); i++) {
+            //System.out.println(itemsToSort.get(i).getTitle());
+            //Comparator<ItemWithCreationDate> titleComparator =
+            // (itemsToSort.get(i).getTitle().compareToIgnoreCase(itemsToSort.get(i+1).getTitle()))
+         //   ItemWithCreationDate currentItem = itemsToSort.get(i);
+          //  itemTitleStrings.add(currentItem.getTitle());
+        //}
+        //for (int i = 0)
+        //return new ResponseEntity<ArrayList<ItemWithCreationDate>>(itemsToSort, HttpStatus.OK);
+
+
+
+
+
+
+
 
 
  /* @RequestMapping(path = "/delete-item", method = RequestMethod.DELETE)
