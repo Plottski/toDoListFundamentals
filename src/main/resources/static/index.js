@@ -1,3 +1,6 @@
+//import * as XLSX from "/xlsx";
+//import {saveAs} from './file-saver';
+//import * as Exceljs from "/exceljs";
 window.onload = function() {
     const mainContainer = document.querySelector('#mainContainer');
     const mainDivContainer = document.querySelector('#mainDivContainer');
@@ -435,6 +438,28 @@ function displayItemsPage(data) {
         deleteItem();
     });
 
+    var exportButton = document.createElement('button');
+    exportButton.type = 'button';
+    exportButton.id = 'exportButton';
+    exportButton.innerHTML = 'Export to Excel';
+    exportButton.setAttribute('class', 'btn btn-Secondary');
+    exportButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        var listName = document.getElementById('pageHeader').innerHTML;
+        $.ajax({
+            url: "/find-specific-list",
+            method: "POST",
+            contentType: "application/json",
+            data: listName,
+            success: function (data) {
+                exportToExcel(data);
+            },
+            error: function (xhr) {
+                console.log("Shid is fucked");
+            }
+        })
+    })
+
     var tableDiv = document.createElement('div');
     tableDiv.id = 'tableDiv';
     tableDiv.className = 'd-flex position-relative top-50 align-items-center justify-content-center align-middle';
@@ -500,6 +525,7 @@ function displayItemsPage(data) {
     headerRow.appendChild(dueDateHeader);
 
     secondDiv.appendChild(deleteButton);
+    secondDiv.appendChild(exportButton);
 
     theHeader.appendChild(headerRow);
 
@@ -544,24 +570,28 @@ function displayItemsPage(data) {
         descCol.setAttribute('id', 'desc-' + i);
         descCol.innerHTML = userItems[i].description;
         descCol.style.cursor = 'pointer';
+        descCol.addEventListener('click', filterByDescription);
 
         var userCol = document.createElement('td');
         userCol.setAttribute('scope', 'col');
         userCol.setAttribute('id', 'user-' + i);
         userCol.innerHTML = userItems[i].username;
         userCol.style.cursor = 'pointer';
+        userCol.addEventListener('click', filterByUsername);
 
         var timeCol = document.createElement('td');
         timeCol.setAttribute('scope', 'col');
         timeCol.setAttribute('id', 'time-' + i);
         timeCol.innerHTML = theCreationDate.toLocaleDateString('en-US');
         timeCol.style.cursor = 'pointer';
+        timeCol.addEventListener('click', filterByCreationTime);
 
         var dueDateCol = document.createElement('td');
         dueDateCol.setAttribute('scope', 'col');
         dueDateCol.setAttribute('id', 'dueDate-' + i);
         dueDateCol.innerHTML = userItems[i].dueDate;
         dueDateCol.style.cursor = 'pointer';
+        dueDateCol.addEventListener('click', filterByDueDate);
 
         row.appendChild(selectCol);
         row.appendChild(titleCol);
@@ -883,7 +913,7 @@ function sortByTitle(event) {
                 //console.log(rowsToAppend);
                 k++;
             }
-    theTable = document.getElementById("itemTable");
+    var theTable = document.getElementById("itemTable");
     theTable.appendChild(tableBody);
     console.log(rowsToAppend);
 
@@ -944,7 +974,7 @@ function sortDescendingByTitle(event) {
         //console.log(rowsToAppend);
         k++;
     }
-    theTable = document.getElementById("itemTable");
+    var theTable = document.getElementById("itemTable");
     theTable.appendChild(tableBody);
     console.log(rowsToAppend);
 
@@ -956,11 +986,8 @@ function sortDescendingByTitle(event) {
 }
 
 function filterByTitle(event) {
-    event.preventDefault();
     var title = event.target.innerHTML;
     var listName = document.getElementById("pageHeader").innerHTML;
-    console.log(title);
-    console.log(listName);
     $.ajax({
         url: '/filterByTitle',
         method: "POST",
@@ -971,12 +998,213 @@ function filterByTitle(event) {
         }),
         success: function (data) {
             displayItemsPage(data);
+            var theTitleColumn = document.getElementById('title-0');
+            theTitleColumn.removeEventListener('click', sortByTitle);
+            theTitleColumn.addEventListener('click', getSpecificListInTableView);
         },
         error: function (xhr) {
             console.log("Error has occured");
         }
     })
 }
+
+function filterByDescription(event) {
+    var description = event.target.innerHTML;
+    var listName = document.getElementById("pageHeader").innerHTML;
+    $.ajax({
+        url: '/filterByDescription',
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            description: description,
+            listName: listName,
+        }),
+        success: function (data) {
+            displayItemsPage(data);
+            var theDescriptionColumn = document.getElementById('desc-0');
+            theDescriptionColumn.removeEventListener('click', filterByDescription);
+            theDescriptionColumn.addEventListener('click', getSpecificListInTableView);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function filterByUsername(event) {
+    var username = event.target.innerHTML;
+    var listName = document.getElementById("pageHeader").innerHTML;
+    $.ajax({
+        url: '/filterByUsername',
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            username: username,
+            listName: listName,
+        }),
+        success: function (data) {
+            displayItemsPage(data);
+            if (data.length > 1) {
+                for (var j = 0; j < data.length; j++) {
+                    var theUserColumn = document.getElementById('user-' + j);
+                    console.log(theUserColumn);
+                    theUserColumn.removeEventListener('click', filterByUsername);
+                    theUserColumn.addEventListener('click', getSpecificListInTableView);
+                }
+            }
+            else {
+                var theUserColumn = document.getElementById('user-0');
+                console.log(theUserColumn);
+                theUserColumn.removeEventListener('click', filterByDescription);
+                theUserColumn.addEventListener('click', getSpecificListInTableView);
+            }
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function filterByDueDate(event) {
+    var dueDate = event.target.innerHTML;
+    var listName = document.getElementById("pageHeader").innerHTML;
+    $.ajax({
+        url: '/filterByDueDate',
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            dueDate: dueDate,
+            listName: listName,
+        }),
+        success: function (data) {
+            displayItemsPage(data);
+            if (data.length > 1) {
+                for (var j = 0; j < data.length; j++) {
+                    var theDateColumn = document.getElementById('dueDate-' + j);
+                    theDateColumn.removeEventListener('click', filterByDueDate);
+                    theDateColumn.addEventListener('click', getSpecificListInTableView);
+                }
+            }
+            else {
+                var theDateColumn = document.getElementById('dueDate-0');
+                theDateColumn.removeEventListener('click', filterByDueDate);
+                theDateColumn.addEventListener('click', getSpecificListInTableView);
+            }
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function filterByCreationTime(event) {
+    var creationTime = event.target.innerHTML;
+    var listName = document.getElementById("pageHeader").innerHTML;
+    $.ajax({
+        url: '/filterByCreationTime',
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            creationTime: creationTime,
+            listName: listName,
+        }),
+        success: function (data) {
+            displayItemsPage(data);
+            if (data.length > 1) {
+                for (var j = 0; j < data.length; j++) {
+                    var theCreationColumn = document.getElementById('time-' + j);
+                    console.log(theCreationColumn);
+                    theCreationColumn.removeEventListener('click', filterByCreationTime);
+                    theCreationColumn.addEventListener('click', getSpecificListInTableView);
+                }
+            }
+            else {
+                var theCreationColumn = document.getElementById('time-0');
+                console.log(theCreationColumn);
+                theCreationColumn.removeEventListener('click', filterByCreationTime);
+                theCreationColumn.addEventListener('click', getSpecificListInTableView);
+            }
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
+function getSpecificListInTableView(event) {
+    event.preventDefault()
+    var listName = document.getElementById('pageHeader').innerHTML;
+    $.ajax({
+        url: "/find-specific-list",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            displayItemsPage(data);
+        },
+        error: function (xhr) {
+            console.log("Shid is fucked");
+        }
+    })
+}
+
+function exportToExcel() {
+    var listName = document.getElementById('pageHeader').innerHTML;
+    $.ajax({
+        url: "/exportToExcel",
+        method: "POST",
+        contentType: "application/json",
+        data: listName,
+        success: function (data) {
+            
+        },
+        error: function (xhr) {
+            console.log("Shid is fucked");
+        }
+    })
+}
+
+/*async function exportToExcel() {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('userExport', {});
+
+    var rows = document.getElementsByTagName('tr');
+    console.log(rows);
+    for (var i = 0; i < rows.length; i++) {
+        var columnToDelete = document.getElementById('radio-' + i);
+        rows[i].removeChild(columnToDelete);
+        worksheet.addRow(rows[i]);
+    }
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'userExport.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+} */
+
+
+/*function exportToExcel(data, filename = 'listexport.xlsx') {
+    const workbook = XLSX.utils.book_new();
+
+    let worksheet;
+    if (Array.isArray(data) && Array.isArray(data[0])) {
+        worksheet = XLSX.utils.aoa_to_sheet(data);
+    }else if (Array.isArray(data) && typeof data[0] === 'object') {
+        worksheet = XLSX.utils.json_to_sheet(data);
+    }else {
+        console.error("This shid didn't work amigo!");
+        return;
+    }
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    XLSX.writeFile(workbook, filename);
+}*/
 
         //tableBody.remove(document.getElementsByTagName('tr'));
         //tableBody.append(rowsToAppend);

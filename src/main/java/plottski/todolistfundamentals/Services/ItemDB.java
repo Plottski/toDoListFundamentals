@@ -17,6 +17,14 @@ public interface ItemDB extends CrudRepository<ItemWithCreationDate, Integer> {
 
     ArrayList<ItemWithCreationDate> findAllByUserIDAndTitle(int userID, String title);
 
+    ArrayList<ItemWithCreationDate> findAllByUserIDAndDescription(int userID, String description);
+
+    ArrayList<ItemWithCreationDate> findAllByUserIDAndUsername(int userID, String username);
+
+    ArrayList<ItemWithCreationDate> findAllByUserIDAndListName(int userID, String listName);
+
+    ArrayList<ItemWithCreationDate> findAllByUserIDAndDueDate(int userID, String dueDate);
+
     //@Query(value = "SELECT * FROM items WHERE userID = ?1 AND title = ?1")
     //ArrayList<ItemWithCreationDate> findAllByUserIDAndTitle(int userID, String title);
 

@@ -1,18 +1,26 @@
 package plottski.todolistfundamentals.Controllers;
 
 import jakarta.servlet.http.HttpSession;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import plottski.todolistfundamentals.Entities.*;
 import plottski.todolistfundamentals.Services.*;
 
-import java.text.DateFormat;
-import java.text.ParseException;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
+
 
 import static java.lang.Double.parseDouble;
 
@@ -22,35 +30,16 @@ public class ServerController {
     @Autowired
     UserRepo users;
 
-    //@Autowired
-    //UserMongoRepo mongoUsers;
-
     @Autowired
     ItemDB items;
-
-    // @Autowired
-    // ItemMongoDB mongoItems;
 
     @Autowired
     UserItemListsRepo userLists;
 
-    //@Autowired
-    //UserItemListsMongoRepo userMongoLists;
-
     private final HashMap<String, User> userDB = new HashMap<String, User>();
     private final HashMap<String, ArrayList<Item>> itemDB = new HashMap<String, ArrayList<Item>>();
 
-    /*@RequestMapping(path = "/signup", method = RequestMethod.POST)
-    public ResponseEntity<UserForDB> userSignUp(HttpSession session, @RequestBody UserForDB user) {
-        if (users.findByUsername(user.getUsername()) != null) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
 
-            UserForDB userForDB = new UserForDB(user.getUsername(), user.getPassword(), "plottski@gmail.com", true);
-            users.save(userForDB);
-            session.setAttribute("username", userForDB.getUsername());
-            return new ResponseEntity<UserForDB>(user, HttpStatus.OK);
-}*/
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
     public ResponseEntity<UserForDB> userSignUp(HttpSession session, @RequestBody UserForDB user) {
         if (users.findByUsername(user.getUsername()) != null && !isValidEmail(user.getEmail())) {
@@ -69,7 +58,6 @@ public class ServerController {
             session.setAttribute("username", userFromDB.getUsername());
             userFromDB.setLoggedIn(true);
             users.save(userFromDB);
-            //session.setAttribute("username", userFromDB.getUsername());
             return new ResponseEntity<UserForDB>(userFromDB, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -440,8 +428,212 @@ public class ServerController {
         }
         userItemList.setUserItems(userItems);
         return new ResponseEntity<>(userItemList, HttpStatus.OK);
-
     }
+
+    @RequestMapping(path = "/filterByDescription", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> filterItemsByDescription(HttpSession session, @RequestBody HashMap<String, String> json) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndDescription(userFromDB.getId(), json.get("description"));
+        UserItemList userItemList = userLists.findByListName(json.get("listName"));
+        userItemList.setUserItems(userItems);
+        System.out.println(json.get("listName"));
+        System.out.println(json.get("description"));
+        if (userItemList.getUserItems().getFirst() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userItemList.setUserItems(userItems);
+        return new ResponseEntity<>(userItemList, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/filterByUsername", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> filterItemsByUsername(HttpSession session, @RequestBody HashMap<String, String> json) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        //ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndDescription(userFromDB.getId(), json.get("description"));
+        ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndUsername(userFromDB.getId(), json.get("username"));
+        UserItemList userItemList = userLists.findByListName(json.get("listName"));
+        userItemList.setUserItems(userItems);
+        System.out.println(json.get("listName"));
+        System.out.println(json.get("description"));
+        if (userItemList.getUserItems().getFirst() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userItemList.setUserItems(userItems);
+        return new ResponseEntity<>(userItemList, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/filterByCreationTime", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> filterItemsByCreationTime(HttpSession session, @RequestBody HashMap<String, String> json) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndListName(userFromDB.getId(), json.get("listName"));
+        ArrayList<ItemWithCreationDate> itemsWithSpecificCreationDates = new ArrayList<>();
+        HashMap<String, ArrayList<ItemWithCreationDate>> longToStringDate = new HashMap<>();
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("MM/dd/yyyy");
+        for (int i = 0; i < userItems.size(); i++) {
+            Date dateToString = new Date(userItems.get(i).getCreationTime());
+            if (timeFormatter.format(dateToString).equals(json.get("creationTime"))) {
+                itemsWithSpecificCreationDates.add(userItems.get(i));
+            }
+        }
+        longToStringDate.put(json.get("creationTime"), itemsWithSpecificCreationDates);
+
+        UserItemList userItemList = userLists.findByListName(json.get("listName"));
+        userItemList.setUserItems(itemsWithSpecificCreationDates);
+
+        if (userItemList.getUserItems().getFirst() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(userItemList, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/filterByDueDate", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> filterItemsByDueDate(HttpSession session, @RequestBody HashMap<String, String> json) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndDueDate(userFromDB.getId(), json.get("dueDate"));
+        UserItemList userItemList = userLists.findByListName(json.get("listName"));
+        userItemList.setUserItems(userItems);
+
+        if (userItemList.getUserItems().getFirst() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        userItemList.setUserItems(userItems);
+        return new ResponseEntity<>(userItemList, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/exportToExcel", method = RequestMethod.POST)
+    public ResponseEntity<ArrayList<ItemWithCreationDate>> exportItemsToExcel(HttpSession session, @RequestBody String listname) throws IOException {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        if (!validUser(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndListName(userFromDB.getId(), listname);
+
+        Workbook workbook = new XSSFWorkbook();
+
+        Sheet sheet = workbook.createSheet("Sheet1");
+        int rowNum = 1;
+
+        Row headerRow = sheet.createRow(1);
+
+        Cell titleHeader = headerRow.createCell(0);
+        titleHeader.setCellValue("Title");
+
+        Cell descriptionHeader = headerRow.createCell(1);
+        descriptionHeader.setCellValue("Description");
+
+        Cell userHeader = headerRow.createCell(2);
+        userHeader.setCellValue("User");
+
+        Cell creationHeader = headerRow.createCell(3);
+        creationHeader.setCellValue("Created");
+
+        Cell dueDateHeader = headerRow.createCell(4);
+        dueDateHeader.setCellValue("Due Date");
+
+        for (ItemWithCreationDate item : userItems) {
+            Row row = sheet.createRow(rowNum++);
+
+            //I stored creation time as a long so I am converting it to a string to put into the sheet like you would see it on the website.
+            SimpleDateFormat timeFormatter = new SimpleDateFormat("MM/dd/yyyy");
+            Date dateToString = new Date(item.getCreationTime());
+            String creationTime = timeFormatter.format(dateToString);
+
+            Cell titleCell = row.createCell(0);
+            titleCell.setCellValue(item.getTitle());
+
+            Cell descriptionCell = row.createCell(1);
+            descriptionCell.setCellValue(item.getDescription());
+
+            Cell userCell = row.createCell(2);
+            userCell.setCellValue(item.getUsername());
+
+            Cell creationTimeCell = row.createCell(3);
+            creationTimeCell.setCellValue(creationTime);
+
+            Cell dueDateCell = row.createCell(4);
+            dueDateCell.setCellValue(item.getDueDate());
+        }
+
+        try (FileOutputStream fileOut = new FileOutputStream(userFromDB.getUsername() +"-"+ listname +"-Export.xlsx")) {
+            workbook.write(fileOut);
+            System.out.println("Excel file created successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                workbook.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ResponseEntity<>(userItems, HttpStatus.OK);
+    }
+
+
+
+
+    //Would like a code review of what I was trying and why it was not working
+
+
+      /*for (ItemWithCreationDate item : userItems) {
+            System.out.println(userItems.size());
+            SimpleDateFormat timeFormatter = new SimpleDateFormat("MM/dd/yyyy");
+            Date dateToString = new Date(item.getCreationTime());
+            if (!timeFormatter.format(dateToString).equals(json.get("creationTime"))) {
+                userItems.remove(item);
+            }
+        }*/
+    //ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndDescription(userFromDB.getId(), json.get("description"));
+    //ArrayList<ItemWithCreationDate> userItems = items.findAllByUserIDAndUsername(userFromDB.getId(), json.get("creationTime"));
+       /*for (int i = 0; i < userItems.size(); i++) {
+            SimpleDateFormat timeFormatter = new SimpleDateFormat("MM/dd/yyyy");
+            Date dateToString = new Date(userItems.get(i).getCreationTime());
+           // longToStringDate.put(timeFormatter.format(dateToString), userItems.get(i));
+            System.out.println(timeFormatter.format(dateToString));
+            System.out.println(longToStringDate.size());
+            System.out.println(longToStringDate.keySet());
+            //System.out.println(dateToString);
+            //System.out.println(userItems.size());
+           /*if (timeFormatter.format(dateToString).equals(json.get("creationTime"))) {
+                itemsWithSpecificCreationDates.add(userItems.get(i));;
+            }*/
+            /*if (!timeFormatter.format(dateToString).equals(json.get("creationTime"))) {
+               // System.out.println(userItems.get(i).getTitle());
+                //userItems.remove(userItems.get(i));
+                userItems.remove(userItems.get(i));
+               // i = 0;
+            }*/
+            //i++;
+
+        //System.out.println(userItems.size());
+        //SimpleDateFormat timeFormatter = new SimpleDateFormat("MM/dd/yyyy");
+        //Date dateToString = new Date(userItems.getFirst().getCreationTime());
+        //String testDateParse = timeFormatter.format(dateToString);
+        //System.out.println(testDateParse);
+
+        //userItemList.setUserItems(itemsWithSpecificCreationDates);
+        //System.out.println(json.get("listName"));
+        //System.out.println(json.get("creationTime"));
+
+
+
 
     Comparator<ItemWithCreationDate> dueDateComparator = new Comparator<ItemWithCreationDate>() {
         @Override
