@@ -37,13 +37,17 @@ public class ItemWithCreationDate {
     private String dueDate;
 
     @ManyToOne
-    private UserItemList listOfItems;
+    //@JoinColumn(name = "userItemList_id", referencedColumnName = "id")
+    UserItemList userItemList = new UserItemList();
+
+    //@ManyToOne
+    //private UserItemList userItemList;
 
     public ItemWithCreationDate() {
 
     }
 
-    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, int listID, String listName, String dueDate, UserItemList listOfItems) {
+    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, int listID, String listName, String dueDate, UserItemList userItemList) {
         this.title = title;
         this.description = description;
         this.creationTime = creationTime;
@@ -52,7 +56,96 @@ public class ItemWithCreationDate {
         this.listID = listID;
         this.listName = listName;
         this.dueDate = dueDate;
-        this.listOfItems = listOfItems;
+        this.userItemList = userItemList;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Long creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public int getUserID() {
+        return userID;
+    }
+
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public int getListID() {
+        return listID;
+    }
+
+    public void setListID(int listID) {
+        this.listID = listID;
+    }
+
+    public String getListName() {
+        return listName;
+    }
+
+    public void setListName(String listName) {
+        this.listName = listName;
+    }
+
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public UserItemList getUserItemList() {
+        return userItemList;
+    }
+
+    public void setUserItemList(UserItemList userItemList) {
+        this.userItemList = userItemList;
+    }
+}
+/*
+    public ItemWithCreationDate(String title, String description, Long creationTime, int userID, String username, int listID, String listName, String dueDate, UserItemList userItemList) {
+        this.title = title;
+        this.description = description;
+        this.creationTime = creationTime;
+        this.userID = userID;
+        this.username = username;
+        this.listID = listID;
+        this.listName = listName;
+        this.dueDate = dueDate;
+        this.userItemList = userItemList;
     }
 
     public int getId() {
@@ -123,14 +216,14 @@ public class ItemWithCreationDate {
         this.dueDate = dueDate;
     }
 
-    public UserItemList getListOfItems() {
-        return listOfItems;
+    public UserItemList getUserItemList() {
+        return userItemList;
     }
 
-    public void setListOfItems(UserItemList listOfItems) {
-        this.listOfItems = listOfItems;
+    public void setUserItemList(UserItemList userItemList) {
+        this.userItemList = userItemList;
     }
-}
+} */
 
 
 

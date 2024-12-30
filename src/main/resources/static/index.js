@@ -1,6 +1,10 @@
-//import * as XLSX from "/xlsx";
+//import * as XLSX from "xlsx";
 //import {saveAs} from './file-saver';
 //import * as Exceljs from "/exceljs";
+//let XLSX = require('xlsx');
+//import XLSX from "xlsx";
+//var XLSX = require("xlsx");
+//import XLSX from "xlsx";
 window.onload = function() {
     const mainContainer = document.querySelector('#mainContainer');
     const mainDivContainer = document.querySelector('#mainDivContainer');
@@ -363,6 +367,27 @@ function sortByDueDateDescending(event) {
     })
 }
 
+function addCollaborator() {
+    var listName = document.getElementById('pageHeader').innerHTML;
+    var collaboratorUserName = document.getElementById('collaboratorInput').innerHTML;
+
+    $.ajax({
+        url: "/add-collaborator",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+         listName: listName,
+         collaboratorUserName: collaboratorUserName,
+        }),
+        success: function (data) {
+            displayItemsPage(data);
+        },
+        error: function (xhr) {
+            console.log("Error has occured");
+        }
+    })
+}
+
 function displayItemsPage(data) {
     mainContainer.innerHTML = '';
 
@@ -460,6 +485,22 @@ function displayItemsPage(data) {
         })
     })
 
+    var collaboratorInput = document.createElement('input');
+    collaboratorInput.type = 'text';
+    collaboratorInput.id = 'collaboratorInput';
+    collaboratorInput.setAttribute('class', 'col-md-3');
+    collaboratorInput.placeholder = 'Add Collaborator';
+
+    var addCollaboratorButton = document.createElement('button');
+    addCollaboratorButton.type = 'button';
+    addCollaboratorButton.id = 'addCollaboratorButton';
+    addCollaboratorButton.innerHTML = 'Add Collaborator';
+    addCollaboratorButton.setAttribute('class', 'btn btn-secondary');
+    addCollaboratorButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        addCollaborator();
+    });
+
     var tableDiv = document.createElement('div');
     tableDiv.id = 'tableDiv';
     tableDiv.className = 'd-flex position-relative top-50 align-items-center justify-content-center align-middle';
@@ -526,6 +567,8 @@ function displayItemsPage(data) {
 
     secondDiv.appendChild(deleteButton);
     secondDiv.appendChild(exportButton);
+    secondDiv.appendChild(collaboratorInput);
+    secondDiv.appendChild(collaboratorInput);
 
     theHeader.appendChild(headerRow);
 
@@ -670,31 +713,41 @@ function addItem() {
                 titleCol.setAttribute('scope', 'col');
                 titleCol.setAttribute('id', 'title-' + i);
                 //titleCol.innerHTML = data[i].userItems[i].title;
+                titleCol.style.cursor = 'pointer';
                 titleCol.innerHTML = theData[i].title;
-                titleCol.appendChild(filterByTitle);
+                //titleCol.appendChild(filterByTitle);
+                titleCol.addEventListener('click', filterByTitle);
 
                 var descCol = document.createElement('td');
                 descCol.setAttribute('scope', 'col');
                 descCol.setAttribute('id', 'desc-' + i);
                 //descCol.innerHTML = data[i].userItems[i].description;
                 descCol.innerHTML = theData[i].description;
+                descCol.style.cursor = 'pointer';
+                descCol.addEventListener('click', filterByDescription);
 
                 var userCol = document.createElement('td');
                 userCol.setAttribute('scope', 'col');
                 userCol.setAttribute('id', 'user-' + i);
                 //userCol.innerHTML = data[i].userItems[i].username;
                 userCol.innerHTML = theData[i].username;
+                userCol.style.cursor = 'pointer';
+                userCol.addEventListener('click', filterByUsername);
 
                 var timeCol = document.createElement('td');
                 timeCol.setAttribute('scope', 'col');
                 timeCol.setAttribute('id', 'time-' + i);
                 timeCol.innerHTML = theCreationDate.toLocaleDateString('en-US');
+                timeCol.style.cursor = 'pointer';
+                timeCol.addEventListener('click', filterByCreationTime);
 
                 var dueDateCol = document.createElement('td');
                 dueDateCol.setAttribute('scope', 'col');
                 dueDateCol.setAttribute('id', 'dueDate-' + i);
                 //dueDateCol.innerHTML = data[i].dueDate;
                 dueDateCol.innerHTML = theData[i].dueDate;
+                dueDateCol.style.cursor = 'pointer';
+                dueDateCol.addEventListener('click', filterByDueDate);
 
                 //console.log(data[i].userItems[i].username);
                 console.log(theData.username);
@@ -1156,7 +1209,7 @@ function exportToExcel() {
         contentType: "application/json",
         data: listName,
         success: function (data) {
-            
+
         },
         error: function (xhr) {
             console.log("Shid is fucked");
@@ -1190,6 +1243,7 @@ function exportToExcel() {
 
 
 /*function exportToExcel(data, filename = 'listexport.xlsx') {
+    //let XLSX = require('xlsx');
     const workbook = XLSX.utils.book_new();
 
     let worksheet;

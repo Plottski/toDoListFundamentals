@@ -15,15 +15,19 @@ public class UserItemList {
     @Column
     private String listName;
 
+    @Column
     private String username;
 
     @Column
     private int userID;
 
-    @OneToMany(mappedBy = "listOfItems")
+    @OneToMany(mappedBy = "userItemList", cascade = CascadeType.ALL)
     private List<ItemWithCreationDate> userItems;
 
-    @OneToMany(mappedBy = "collaborators")
+    //@OneToMany(mappedBy = "userItemList", cascade = CascadeType.ALL, orphanRemoval = true)
+    //private List<ItemWithCreationDate> userItems;
+
+    @OneToMany
     private List<UserForDB> collaborators;
 
     public UserItemList() {

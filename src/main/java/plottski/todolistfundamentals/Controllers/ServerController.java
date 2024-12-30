@@ -36,6 +36,9 @@ public class ServerController {
     @Autowired
     UserItemListsRepo userLists;
 
+    @Autowired
+    CollaborationRepo collaborations;
+
     private final HashMap<String, User> userDB = new HashMap<String, User>();
     private final HashMap<String, ArrayList<Item>> itemDB = new HashMap<String, ArrayList<Item>>();
 
@@ -83,9 +86,35 @@ public class ServerController {
 
         setItemDateAndUser(theItem, userFromDB);
 
-        ResponseEntity<UserItemList> theUserItemList = getUserItemListResponseEntity(theItem, userFromDB);
-        if (theUserItemList != null) return theUserItemList;
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        //UserItemList userItemList = userLists.findByListName(theItem.getListName());
+        //userItemList.getUserItems().add(theItem);
+
+        //List theUserItems = userItemList.getUserItems();
+        //theUserItems.add(theItem);
+        //userItemList.setUserItems(theUserItems);
+        //userLists.save(userItemList);
+
+        UserItemList theUserItemList = userLists.findByListNameAndUserID(theItem.getListName(), userFromDB.getId());
+        System.out.println(theUserItemList.getId());
+        theUserItemList.getUserItems().add(theItem);
+        userLists.save(theUserItemList);
+
+        //theUserItemList.getUserItems().add(theItem);
+        items.save(theItem);
+        //userLists.save(theUserItemList);
+
+        //items.save(theItem);
+
+
+        if (theUserItemList == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        //theUserItemList.getUserItems().add(theItem);
+        //userLists.save(theUserItemList);
+
+        return new ResponseEntity<>(theUserItemList, HttpStatus.OK);
+        //ResponseEntity<UserItemList> theUserItemList = getUserItemListResponseEntity(theItem, userFromDB);
     }
 
 
@@ -586,6 +615,26 @@ public class ServerController {
         return new ResponseEntity<>(userItems, HttpStatus.OK);
     }
 
+    @RequestMapping(path = "/add-collaborator", method = RequestMethod.POST)
+    public ResponseEntity<UserItemList> addCollaboratorToExistingList(HttpSession session, @RequestBody HashMap<String, String> json) {
+        UserForDB userFromDB = users.findByUsername(session.getAttribute("username").toString());
+        String listName = json.get("listName");
+        String collaboratorUserName = json.get("collaboratorUserName");
+        UserForDB userCollaboratorFromDB = users.findByUsername(collaboratorUserName);
+        if (userCollaboratorFromDB.getUsername().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        UserItemList userListForCollaboration = userLists.findByListNameAndUserID(listName, userFromDB.getId());
+        Collaboration collaboration = new Collaboration(userFromDB.getUsername(), userFromDB.getId(),
+                userCollaboratorFromDB.getUsername(), userCollaboratorFromDB.getId(), userListForCollaboration.getId(),
+                userListForCollaboration.getListName());
+
+        collaborations.save(collaboration);
+
+        return new ResponseEntity<>(userListForCollaboration, HttpStatus.OK);
+
+    }
+
 
 
 
@@ -760,6 +809,8 @@ public class ServerController {
         }
         return null;
     }
+
+
 
 }
 
