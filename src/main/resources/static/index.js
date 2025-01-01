@@ -151,7 +151,7 @@ function getSpecificList(data) {
             displayItemsPage(data);
         },
         error: function (xhr) {
-            console.log("Shid is fucked");
+            console.log("error in getSpecificList");
         }
     })
 }
@@ -480,7 +480,7 @@ function displayItemsPage(data) {
                 exportToExcel(data);
             },
             error: function (xhr) {
-                console.log("Shid is fucked");
+                console.log("error in find-specific-list");
             }
         })
     })
@@ -1196,7 +1196,7 @@ function getSpecificListInTableView(event) {
             displayItemsPage(data);
         },
         error: function (xhr) {
-            console.log("Shid is fucked");
+            console.log("error in /find-specific-list");
         }
     })
 }
@@ -1212,7 +1212,7 @@ function exportToExcel() {
 
         },
         error: function (xhr) {
-            console.log("Shid is fucked");
+            console.log("error in exportToExcel");
         }
     })
 }

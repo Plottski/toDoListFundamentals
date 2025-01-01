@@ -1,13 +1,10 @@
 package plottski.todolistfundamentals.Services;
 
 import org.springframework.data.repository.CrudRepository;
-import plottski.todolistfundamentals.Entities.UserForDB;
+import plottski.todolistfundamentals.Entities.User;
 
+public interface UserRepo extends CrudRepository<User, Integer> {
 
-//@Repository
-//@RepositoryRestResource(collectionResourceRel = "users", path = "users") PagingAndSortingRepository<UserForDB, Integer>,
-public interface UserRepo extends CrudRepository<UserForDB, Integer> {
-
-    UserForDB findByUsername(String username);
+    User findByUsername(String username);
 
 }

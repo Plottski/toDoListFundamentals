@@ -1,17 +1,59 @@
 package plottski.todolistfundamentals.Entities;
 
-public class Item {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 
-    String title;
+import java.io.Serializable;
 
-    String description;
 
-    User creator;
+@Entity
+public class Item implements Serializable {
 
-    public Item(String title, String description, User creator) {
+    @Id
+    @GeneratedValue
+    private int id;
+
+    private String listName;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private Long creationTime;
+
+    @Column(nullable = false)
+    private String dueDate;
+
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "todo_list_fk")
+    ToDoList toDoList = new ToDoList();
+
+    public Item() {
+
+    }
+
+    public Item(String title, String description, Long creationTime, User userID, String username, int listID, String listName, String dueDate, ToDoList toDoList) {
         this.title = title;
         this.description = description;
-        this.creator = creator;
+        this.creationTime = creationTime;
+        this.dueDate = dueDate;
+        this.toDoList = toDoList;
+    }
+
+    public String getListName() {
+        return listName;
+    }
+
+    public void setListName(String listName) {
+        this.listName = listName;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -30,11 +72,28 @@ public class Item {
         this.description = description;
     }
 
-    public User getCreator() {
-        return creator;
+    public Long getCreationTime() {
+        return creationTime;
     }
 
-    public void setCreator(User creator) {
-        this.creator = creator;
+    public void setCreationTime(Long creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public ToDoList getTodoList() {
+        return toDoList;
+    }
+
+    public void setTodoList(ToDoList toDoList) {
+        this.toDoList = toDoList;
     }
 }
+
