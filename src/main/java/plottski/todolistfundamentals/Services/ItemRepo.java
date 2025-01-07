@@ -1,13 +1,8 @@
 package plottski.todolistfundamentals.Services;
 
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import plottski.todolistfundamentals.Entities.Item;
 import plottski.todolistfundamentals.Entities.ItemList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public interface ItemRepo extends CrudRepository<Item, Integer> {
@@ -15,6 +10,8 @@ public interface ItemRepo extends CrudRepository<Item, Integer> {
     Item findByTitle(String title);
 
     Item findByItemListAndTitle(ItemList itemList, String title);
+
+    Item findById(int id);
 
 
 

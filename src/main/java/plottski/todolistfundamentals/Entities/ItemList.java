@@ -23,6 +23,10 @@ public class ItemList {
     @JsonBackReference(value = "user-lists")
     private User user;
 
+    @OneToMany
+    @JsonManagedReference(value = "itemListCollaborators")
+    private List<Collaborator> collaborators;
+
     public ItemList() {
     }
 

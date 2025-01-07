@@ -1,28 +1,14 @@
 package plottski.todolistfundamentals.Controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import plottski.todolistfundamentals.Entities.*;
 import plottski.todolistfundamentals.Services.*;
-import plottski.todolistfundamentals.Utilities.ItemAndListWrapperUtilClass;
-import plottski.todolistfundamentals.Utilities.ItemListWithUserWrapper;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.*;
 
 
@@ -38,8 +24,8 @@ public class ServerController {
     ItemRepo items;
 
     @Transactional
-    private void deleteItem(int id) {
-
+    private void delete(int id) {
+            items.deleteById(id);
     }
 
     @Autowired
@@ -155,9 +141,11 @@ public class ServerController {
 //        }
 
         long creationTime = Long.parseLong(itemWithListName.get("creationTime"));
-        Item item = new Item(itemWithListName.get("title"), itemWithListName.get("description"), creationTime,
-                itemWithListName.get("dueDate"), user.getUsername(), itemList, user);
+//        Item item = new Item(itemWithListName.get("title"), itemWithListName.get("description"), creationTime,
+//                itemWithListName.get("dueDate"), user.getUsername(), itemList, user);
 
+        Item item = new Item(itemWithListName.get("title"), itemWithListName.get("description"), creationTime,
+                itemWithListName.get("dueDate"), user.getUsername(), itemList);
 
         //Item item = itemAndListWrapperUtilClass.getItem();
         //String listName = itemAndListWrapperUtilClass.getListName();
@@ -357,7 +345,7 @@ public class ServerController {
 
         ItemList itemList = itemLists.findByItems(item);
 
-        deleteUserItem(item, session);
+        //deleteUserItem(item, session);
 
         System.out.println(itemList.getItems().size());
 
@@ -369,25 +357,28 @@ public class ServerController {
         if (NOT_FOUND != null) return NOT_FOUND;
 
 
-
+        Item itemToDelete = items.findById(item.getId());
         System.out.println(itemList.getItems().size());
-
-        itemList.getItems().remove(item);
+        //items.delete(item);
+        //items.delete(itemToDelete);
+        itemList.getItems().remove(itemToDelete);
+        System.out.println(itemList.getItems().size());
         itemLists.save(itemList);
-        items.deleteById(item.getId());
+       // itemLists.save(itemList);
+        //items.deleteById(item.getId());
         //items.deleteByItem(item);
 
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
 
-    @Transactional
-    public void deleteUserItem(Item item, HttpSession session) {
-        User user = findUserBySession(session);
-        System.out.println(user.getItems().size());
-        user.getItems().remove(item);
-        System.out.println(user.getItems().size());
-        users.save(user);
-    }
+//    @Transactional
+//    public void deleteUserItem(Item item, HttpSession session) {
+//        User user = findUserBySession(session);
+//        System.out.println(user.getItems().size());
+//        user.getItems().remove(item);
+//        System.out.println(user.getItems().size());
+//        users.save(user);
+//    }
 
 
     private static ResponseEntity<ItemList> itemListNullCheck(ItemList itemList) {

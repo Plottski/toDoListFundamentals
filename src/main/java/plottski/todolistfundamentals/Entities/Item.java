@@ -32,23 +32,32 @@ public class Item {
     @JsonBackReference(value = "item-list")
     private ItemList itemList;
 
-    @ManyToOne
-    @JsonBackReference(value = "user-items")
-    private User user;
+//    @ManyToOne
+//    @JsonBackReference(value = "user-items")
+//    private User user;
 
     public Item() {
 
     }
 
-    public Item(String title, String description, Long creationTime, String dueDate, String creatorName, ItemList itemList, User user) {
+    public Item(String title, String description, Long creationTime, String dueDate, String creatorName, ItemList itemList) {
         this.title = title;
         this.description = description;
         this.creationTime = creationTime;
         this.dueDate = dueDate;
         this.creatorName = creatorName;
         this.itemList = itemList;
-        this.user = user;
     }
+
+    //    public Item(String title, String description, Long creationTime, String dueDate, String creatorName, ItemList itemList, User user) {
+//        this.title = title;
+//        this.description = description;
+//        this.creationTime = creationTime;
+//        this.dueDate = dueDate;
+//        this.creatorName = creatorName;
+//        this.itemList = itemList;
+//        this.user = user;
+//    }
 
     public int getId() {
         return id;
@@ -102,11 +111,11 @@ public class Item {
         this.itemList = itemList;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 }
