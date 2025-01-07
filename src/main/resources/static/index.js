@@ -127,7 +127,8 @@ function splashPage(data) {
 
 function createNewList(listName) {
     $.ajax({
-        url: "/create-new-list",
+        //url: "/create-new-list",
+        url:"/add-list",
         method: "POST",
         contentType: "application/json",
         data: listName,
@@ -393,7 +394,8 @@ function displayItemsPage(data) {
 
     var userItems = [];
 
-    userItems = data.userItems;
+    console.log(data);
+    userItems = data.items;
 
     var firstDiv = document.createElement('div');
     firstDiv.id = 'itemDiv';
@@ -585,6 +587,13 @@ function displayItemsPage(data) {
 
         var theCreator = userItems[i].username;
 
+        var itemIdCol = document.createElement('td');
+        itemIdCol.setAttribute('scope', 'col');
+        itemIdCol.setAttribute('id', i);
+        itemIdCol.innerHTML = userItems[i].id;
+        itemIdCol.hidden = true;
+        itemIdCol.style.display = 'none';
+
         var selectCol = document.createElement('td');
         selectCol.setAttribute('scope', 'col');
         selectCol.setAttribute('id', 'selectCol' + i);
@@ -618,7 +627,7 @@ function displayItemsPage(data) {
         var userCol = document.createElement('td');
         userCol.setAttribute('scope', 'col');
         userCol.setAttribute('id', 'user-' + i);
-        userCol.innerHTML = userItems[i].username;
+        userCol.innerHTML = userItems[i].creatorName;
         userCol.style.cursor = 'pointer';
         userCol.addEventListener('click', filterByUsername);
 
@@ -636,6 +645,7 @@ function displayItemsPage(data) {
         dueDateCol.style.cursor = 'pointer';
         dueDateCol.addEventListener('click', filterByDueDate);
 
+        row.appendChild(itemIdCol);
         row.appendChild(selectCol);
         row.appendChild(titleCol);
         row.appendChild(descCol);
@@ -684,7 +694,8 @@ function addItem() {
             dueDate.setAttribute('placeholder', 'Due date');
 
             var theData = [];
-            theData = data.userItems;
+            theData = data.items;
+
 
             console.log(theData);
 
@@ -697,6 +708,13 @@ function addItem() {
                 var newRow = document.createElement("tr");
                 newRow.setAttribute('scope', 'row');
                 newRow.setAttribute('id', 'newTableRow-' + i);
+
+                var itemIdCol = document.createElement('td');
+                itemIdCol.setAttribute('scope', 'col');
+                itemIdCol.setAttribute('id', i);
+                itemIdCol.innerHTML = theData[i].id;
+                itemIdCol.hidden = true;
+                itemIdCol.style.display = 'none';
 
                 var selectCol = document.createElement('td');
                 selectCol.setAttribute('scope', 'col');
@@ -730,7 +748,8 @@ function addItem() {
                 userCol.setAttribute('scope', 'col');
                 userCol.setAttribute('id', 'user-' + i);
                 //userCol.innerHTML = data[i].userItems[i].username;
-                userCol.innerHTML = theData[i].username;
+                userCol.innerHTML = theData[i].creatorName;
+                //userCol.innerHTML = theData[i].user.username;
                 userCol.style.cursor = 'pointer';
                 userCol.addEventListener('click', filterByUsername);
 
@@ -750,8 +769,9 @@ function addItem() {
                 dueDateCol.addEventListener('click', filterByDueDate);
 
                 //console.log(data[i].userItems[i].username);
-                console.log(theData.username);
+                console.log(theData.creatorName);
 
+                newRow.appendChild(itemIdCol);
                 newRow.appendChild(selectCol);
                 newRow.appendChild(titleCol);
                 newRow.appendChild(descCol);
@@ -785,9 +805,11 @@ function deleteItem() {
             var creationTime = document.getElementById('time-' + i).innerHTML;
             var theCreationTime = Date.parse(creationTime);
             var dueDate = document.getElementById('dueDate-' + i).innerHTML;
+            var theID = document.getElementById(i).innerHTML;
             console.log(title)
             console.log(desc);
             console.log(userName);
+            console.log(theID);
             $.ajax({
                 url: "/delete-item",
                 contentType: "application/json",
@@ -798,6 +820,7 @@ function deleteItem() {
                     "username": userName,
                     "creationTime": theCreationTime,
                     "dueDate": dueDate,
+                    "id": theID,
                 }),
                 success: function (data) {
                     console.log(data);
