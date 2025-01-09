@@ -12,7 +12,7 @@ import java.util.List;
 public class User implements Serializable{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private int id;
 
     @Column(nullable = false)

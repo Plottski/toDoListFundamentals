@@ -24,6 +24,8 @@ function login() {
     console.log(pw);
     console.log(uName);
 
+    var rect = new Rectangle(1, 2);
+    console.log("Printing rectanlge dimensions: "+rect.height+", "+rect.width);
     $.ajax({
         url: "/login",
         method: "POST",

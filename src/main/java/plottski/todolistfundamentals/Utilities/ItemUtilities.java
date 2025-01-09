@@ -5,7 +5,7 @@ import plottski.todolistfundamentals.Entities.User;
 
 public class ItemUtilities {
 
-    public Item setItemDateAndUserDetails(Item theItem, User userFromDB) {
+    public static Item setItemDateAndUserDetails(Item theItem, User userFromDB) {
 
 
         return theItem;

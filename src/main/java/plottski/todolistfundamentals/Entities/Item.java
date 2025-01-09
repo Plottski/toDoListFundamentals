@@ -10,7 +10,7 @@ import java.util.List;
 public class Item {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private int id;
 
     @Column(nullable = false)
@@ -26,7 +26,7 @@ public class Item {
     private String dueDate;
 
     @Column(nullable = false)
-    private String creatorName;
+    private User createdByUser;
 
     @ManyToOne
     @JsonBackReference(value = "item-list")
