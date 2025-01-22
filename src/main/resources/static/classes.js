@@ -5,3 +5,10 @@ class Rectangle {
         this.width = width;
     }
 }
+
+class ItemListWithUserWrapper {
+    constructor(listName, username) {
+        this.listName = listName;
+        this.username = username;
+    }
+}

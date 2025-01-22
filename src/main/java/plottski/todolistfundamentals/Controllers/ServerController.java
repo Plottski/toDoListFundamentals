@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import plottski.todolistfundamentals.Entities.*;
 import plottski.todolistfundamentals.Services.*;
+import plottski.todolistfundamentals.Utilities.ItemListWithUserWrapper;
 
 import java.util.*;
 
@@ -30,6 +31,7 @@ public class ServerController {
 
     @Autowired
     ItemListsRepo itemLists;
+
 
     @RequestMapping(path = "/signup", method = RequestMethod.POST)
     public ResponseEntity<User> userSignUp(HttpSession session, @RequestBody User user) {
@@ -70,7 +72,7 @@ public class ServerController {
         if (user.getUsername() == null) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        ItemList itemList = new ItemList(listName, null, user);
+        ItemList itemList = new ItemList(listName, null, user, null);
         user.getItemLists().add(itemList);
         users.save(user);
         return new ResponseEntity<>(itemList, HttpStatus.OK);
@@ -145,7 +147,7 @@ public class ServerController {
 //                itemWithListName.get("dueDate"), user.getUsername(), itemList, user);
 
         Item item = new Item(itemWithListName.get("title"), itemWithListName.get("description"), creationTime,
-                itemWithListName.get("dueDate"), user.getUsername(), itemList);
+                itemWithListName.get("dueDate"), itemList);
 
         //Item item = itemAndListWrapperUtilClass.getItem();
         //String listName = itemAndListWrapperUtilClass.getListName();
@@ -158,6 +160,29 @@ public class ServerController {
         //ItemListWithUserWrapper itemListWithUserWrapper = new ItemListWithUserWrapper(itemList, user);
         return new ResponseEntity<>(itemList, HttpStatus.OK);
         //return new ResponseEntity<>(itemListWithUserWrapper, HttpStatus.OK);
+    }
+
+@PostMapping("/add-collaborator")
+public ResponseEntity<ItemList> addCollaboratorToItemList(HttpSession session, @RequestBody ItemListWithUserWrapper itemListWithUserWrapper) {
+        User user = findUserBySession(session);
+
+    System.out.println(itemListWithUserWrapper.getListName());
+    System.out.println(itemListWithUserWrapper.getUsername());
+
+        User userCollaboratorToAdd = users.findByUsername(itemListWithUserWrapper.getUsername());
+
+        ItemList itemList = itemLists.findByListNameAndUser(itemListWithUserWrapper.getListName(), user);
+
+        if (itemList.getCollaborators().stream().anyMatch(user1 ->
+            user1.getUsername().equals(userCollaboratorToAdd.getUsername()))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        itemList.getCollaborators().add(userCollaboratorToAdd);
+        itemLists.save(itemList);
+
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
+
     }
 
 //    @RequestMapping(path = "/add-item", method = RequestMethod.POST)
@@ -238,37 +263,37 @@ public class ServerController {
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/sort-items-users-ascending", method = RequestMethod.POST)
-    public ResponseEntity<ItemList> sortItemsByUsersAscending(HttpSession session, @RequestBody String listName) {
-        User user = findUserBySession(session);
+//    @RequestMapping(path = "/sort-items-users-ascending", method = RequestMethod.POST)
+//    public ResponseEntity<ItemList> sortItemsByUsersAscending(HttpSession session, @RequestBody String listName) {
+//        User user = findUserBySession(session);
+//
+//        ResponseEntity<ItemList> FORBIDDEN = userValidationCheck(user);
+//        if (FORBIDDEN != null) return FORBIDDEN;
+//
+//        ItemList itemList = itemLists.findByListNameAndUser(listName, user);
+//
+//        ResponseEntity<ItemList> NOT_FOUND = itemListNullCheck(itemList);
+//        if (NOT_FOUND != null) return NOT_FOUND;
+//
+//        itemList.getItems().sort(usersComparator);
+//        return new ResponseEntity<>(itemList, HttpStatus.OK);
+//    }
 
-        ResponseEntity<ItemList> FORBIDDEN = userValidationCheck(user);
-        if (FORBIDDEN != null) return FORBIDDEN;
-
-        ItemList itemList = itemLists.findByListNameAndUser(listName, user);
-
-        ResponseEntity<ItemList> NOT_FOUND = itemListNullCheck(itemList);
-        if (NOT_FOUND != null) return NOT_FOUND;
-
-        itemList.getItems().sort(usersComparator);
-        return new ResponseEntity<>(itemList, HttpStatus.OK);
-    }
-
-    @PostMapping("/sort-items-users-descending")
-    public ResponseEntity<ItemList> sortItemsByUsersDescending(HttpSession session, @RequestBody String listName) {
-        User user = findUserBySession(session);
-
-        ResponseEntity<ItemList> FORBIDDEN = userValidationCheck(user);
-        if (FORBIDDEN != null) return FORBIDDEN;
-
-        ItemList itemList = itemLists.findByListNameAndUser(listName, user);
-
-        ResponseEntity<ItemList> NOT_FOUND = itemListNullCheck(itemList);
-        if (NOT_FOUND != null) return NOT_FOUND;
-
-        itemList.getItems().sort(usersComparator.reversed());
-        return new ResponseEntity<>(itemList, HttpStatus.OK);
-    }
+//    @PostMapping("/sort-items-users-descending")
+//    public ResponseEntity<ItemList> sortItemsByUsersDescending(HttpSession session, @RequestBody String listName) {
+//        User user = findUserBySession(session);
+//
+//        ResponseEntity<ItemList> FORBIDDEN = userValidationCheck(user);
+//        if (FORBIDDEN != null) return FORBIDDEN;
+//
+//        ItemList itemList = itemLists.findByListNameAndUser(listName, user);
+//
+//        ResponseEntity<ItemList> NOT_FOUND = itemListNullCheck(itemList);
+//        if (NOT_FOUND != null) return NOT_FOUND;
+//
+//        itemList.getItems().sort(usersComparator.reversed());
+//        return new ResponseEntity<>(itemList, HttpStatus.OK);
+//    }
 
     @PostMapping("/sort-items-creationdate-ascending")
     public ResponseEntity<ItemList> sortItemsByCreationDateAscending(HttpSession session, @RequestBody String listName) {
@@ -382,6 +407,8 @@ public class ServerController {
 
 
     private static ResponseEntity<ItemList> itemListNullCheck(ItemList itemList) {
+        //ComparatorWrapper comparatorWrapper = new ComparatorWrapper();
+        //Comparator<Item> dueDateComparator = //comparatorWrapper.getDueDateComparator();
         if (itemList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -395,12 +422,14 @@ public class ServerController {
         return null;
     }
 
-    Comparator<Item> dueDateComparator = new Comparator<Item>() {
+    private Comparator<Item> dueDateComparator = new Comparator<Item>() {
         @Override
         public int compare(Item item1, Item item2) {
             return item1.getDueDate().compareTo(item2.getDueDate());
         }
     };
+
+
 
     Comparator<Item> creationDateComparator = new Comparator<Item>() {
         @Override
@@ -409,12 +438,12 @@ public class ServerController {
         }
     };
 
-    Comparator<Item> usersComparator = new Comparator<Item>() {
-        @Override
-        public int compare(Item item1, Item item2) {
-            return item1.getCreatorName().compareToIgnoreCase(item2.getCreatorName());
-        }
-    };
+//    Comparator<Item> usersComparator = new Comparator<Item>() {
+//        @Override
+//        public int compare(Item item1, Item item2) {
+//            return item1.getCreatorName().compareToIgnoreCase(item2.getCreatorName());
+//        }
+//    };
 
 
 

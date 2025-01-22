@@ -372,16 +372,17 @@ function sortByDueDateDescending(event) {
 
 function addCollaborator() {
     var listName = document.getElementById('pageHeader').innerHTML;
-    var collaboratorUserName = document.getElementById('collaboratorInput').innerHTML;
+    var username = document.getElementById('collaboratorInput').value;
+    console.log(username);
+    var itemListWithUserWrapper = new ItemListWithUserWrapper(listName, username);
+    console.log(JSON.stringify({itemListWithUserWrapper}));
 
     $.ajax({
         url: "/add-collaborator",
         method: "POST",
         contentType: "application/json",
-        data: JSON.stringify({
-         listName: listName,
-         collaboratorUserName: collaboratorUserName,
-        }),
+        data: JSON.stringify(itemListWithUserWrapper),
+        dataType: 'json',
         success: function (data) {
             displayItemsPage(data);
         },
@@ -572,7 +573,7 @@ function displayItemsPage(data) {
     secondDiv.appendChild(deleteButton);
     secondDiv.appendChild(exportButton);
     secondDiv.appendChild(collaboratorInput);
-    secondDiv.appendChild(collaboratorInput);
+    secondDiv.appendChild(addCollaboratorButton);
 
     theHeader.appendChild(headerRow);
 

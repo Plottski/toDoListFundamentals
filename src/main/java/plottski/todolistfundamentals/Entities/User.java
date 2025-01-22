@@ -34,40 +34,20 @@ public class User implements Serializable{
     @JsonManagedReference(value = "user-lists")
     private List<ItemList> itemLists;
 
-//    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-//    @JsonManagedReference(value = "user-items")
-//    private List<Item> items;
-
-//    @ManyToOne
-//    private ItemList collaborators;
+    @ManyToMany
+    private List<ItemList> collaborations;
 
     public User() {
     }
 
-    public User(String username, String password, String email, boolean isLoggedIn, List<ItemList> itemLists) {
+    public User(String username, String password, String email, boolean isLoggedIn, List<ItemList> itemLists, List<ItemList> collaborations) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.isLoggedIn = isLoggedIn;
         this.itemLists = itemLists;
+        this.collaborations = collaborations;
     }
-
-    //    public User(String username, String password, String email, boolean isLoggedIn, List<ItemList> itemLists, List<Item> items) {
-//        this.username = username;
-//        this.password = password;
-//        this.email = email;
-//        this.isLoggedIn = isLoggedIn;
-//        this.itemLists = itemLists;
-//        this.items = items;
-//    }
-
-    //    public User(String username, String password, String email, boolean isLoggedIn, List<ItemList> itemLists) {
-//        this.username = username;
-//        this.password = password;
-//        this.email = email;
-//        this.isLoggedIn = isLoggedIn;
-//        this.itemLists = itemLists;
-//    }
 
     public int getId() {
         return id;
@@ -113,11 +93,11 @@ public class User implements Serializable{
         this.itemLists = itemLists;
     }
 
-//    public List<Item> getItems() {
-//        return items;
-//    }
-//
-//    public void setItems(List<Item> items) {
-//        this.items = items;
-//    }
+    public List<ItemList> getCollaborations() {
+        return collaborations;
+    }
+
+    public void setCollaborations(List<ItemList> collaborations) {
+        this.collaborations = collaborations;
+    }
 }

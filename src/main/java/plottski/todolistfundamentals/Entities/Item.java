@@ -25,9 +25,6 @@ public class Item {
     @Column(nullable = false)
     private String dueDate;
 
-    @Column(nullable = false)
-    private User createdByUser;
-
     @ManyToOne
     @JsonBackReference(value = "item-list")
     private ItemList itemList;
@@ -40,12 +37,11 @@ public class Item {
 
     }
 
-    public Item(String title, String description, Long creationTime, String dueDate, String creatorName, ItemList itemList) {
+    public Item(String title, String description, Long creationTime, String dueDate, ItemList itemList) {
         this.title = title;
         this.description = description;
         this.creationTime = creationTime;
         this.dueDate = dueDate;
-        this.creatorName = creatorName;
         this.itemList = itemList;
     }
 
@@ -95,13 +91,6 @@ public class Item {
         this.dueDate = dueDate;
     }
 
-    public String getCreatorName() {
-        return creatorName;
-    }
-
-    public void setCreatorName(String creatorName) {
-        this.creatorName = creatorName;
-    }
 
     public ItemList getItemList() {
         return itemList;

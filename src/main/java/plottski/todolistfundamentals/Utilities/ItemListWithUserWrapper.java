@@ -5,31 +5,31 @@ import plottski.todolistfundamentals.Entities.User;
 
 public class ItemListWithUserWrapper {
 
-    private ItemList itemList;
+    private String listName;
 
-    private User user;
+    private String username;
 
     public ItemListWithUserWrapper() {
     }
 
-    public ItemListWithUserWrapper(ItemList itemList, User user) {
-        this.itemList = itemList;
-        this.user = user;
+    public ItemListWithUserWrapper(String listName, String username) {
+        this.listName = listName;
+        this.username = username;
     }
 
-    public ItemList getItemList() {
-        return itemList;
+    public String getListName() {
+        return listName;
     }
 
-    public void setItemList(ItemList itemList) {
-        this.itemList = itemList;
+    public void setListName(String listName) {
+        this.listName = listName;
     }
 
-    public User getUser() {
-        return user;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
