@@ -1,8 +1,8 @@
 package plottski.todolistfundamentals.request;
 
-import plottski.todolistfundamentals.Entities.ItemWithCreationDate;
+import plottski.todolistfundamentals.Entities.Item;
 
-public class ItemRequest extends ItemWithCreationDate {
+public class ItemRequest extends Item {
 
     private String listName;
 

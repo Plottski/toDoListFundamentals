@@ -1,9 +1,5 @@
 package plottski.todolistfundamentals.Utilities;
 
-import plottski.todolistfundamentals.Entities.ItemWithCreationDate;
-
-import java.util.Comparator;
-
 //public class TitleComparator implements Comparator<ItemWithCreationDate> {
 
    /* @Override
